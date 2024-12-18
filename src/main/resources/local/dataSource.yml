@@ -2,8 +2,14 @@ spring:
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:test;MODE=PostgreSQL
-    username : nk-test
-    password: bpmg-nk-test
+    username : naamk
+    password: naamk_password
+  # 초기 필요 schema, data load
+  sql:
+    init:
+      mode: never
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/data.sql
   hikari:
     connection-timeout: 3000
     validation-timeout: 3000
@@ -17,7 +23,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
       naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
     properties:
       '[hibernate.default_batch_fetch_size]' : 100

@@ -11,9 +11,9 @@ public class JasyptTest {
     /* prod DB정보 암호화 */
     @Test
     public void stringEncryptor() {
-        String url = "jdbc:postgresql://localhost:5432/test?useunicode=true&characterencoding=utf-8";
-        String username = "nk-test";
-        String password = "bpmg-nk-test";
+        String url = "jdbc:postgresql://localhost:5432/nk_dev?useunicode=true&characterencoding=utf-8";
+        String username = "naamk";
+        String password = "naamk_password";
 
         log.info("[encrypt] url = {}", jasyptEncoding(url));
         log.info("[encrypt] username = {}", jasyptEncoding(username));

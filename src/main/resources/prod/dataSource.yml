@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ENC(3FakaUlRSjB5KUeQUm4BlWYI415dnkR9LcF/lT7oWMwekXsaiiX4NqP7KfzGyahNAwKNCDhnVfvdYzx4tgzauOwxKDWYJsVEEn94PK/8vtJmWWm4gbED4LgOraUGVOa7TFG1ChTCbZz/N10ZP0g0cg==)
-    username : ENC(cRhJpLnkODGWS9yl6VZb54/XjXoITKp3jWqmBXMSP91nbsZWBEm0D/QaJty6Ynas)
-    password: ENC(WieV/oN3a24XpikcGDuLEnvEchJwlLU9QCldC3fCWkoABDHizUWBPfqJTfKYHbRg)
+    url: ENC(TYbWONRpnK+eUGe+DGNB0ukuV5EvhAqhFqF+BQOesiB0LKWmPsE9VvofDhosDrceTEVfufigtoEbnDywF3QMWHVjy5h6TvlKsTPKUJIlrMRnRTyTANSXiFQMokbtgdQXZaF+MgIo/G46TdLKaqTO/w==)
+    username : ENC(BzQK0/38GkerJgfs8ILakyvTbKznpHwQyMzR12UDHvCMSMhjPerCR7pociI/5MGb)
+    password: ENC(lnsSMnBSRJNSUisnaVVMLNov5Au5cJw2oQCsllyqErQMTDWSqIZIEjAVxTQ3MFWs)
     hikari:
       connection-timeout: 3000
       validation-timeout: 3000
