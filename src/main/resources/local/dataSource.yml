@@ -5,11 +5,6 @@ spring:
     username : naamk
     password: naamk_password
   # 초기 필요 schema, data load
-  sql:
-    init:
-      mode: never
-      schema-locations: classpath:db/schema.sql
-      data-locations: classpath:db/data.sql
   hikari:
     connection-timeout: 3000
     validation-timeout: 3000
@@ -20,6 +15,7 @@ spring:
   h2:
     console:
       enabled: true
+      path: /h2-console
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
