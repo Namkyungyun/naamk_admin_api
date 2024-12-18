@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ENC(3FakaUlRSjB5KUeQUm4BlWYI415dnkR9LcF/lT7oWMwekXsaiiX4NqP7KfzGyahNAwKNCDhnVfvdYzx4tgzauOwxKDWYJsVEEn94PK/8vtJmWWm4gbED4LgOraUGVOa7TFG1ChTCbZz/N10ZP0g0cg==)
+    username : ENC(cRhJpLnkODGWS9yl6VZb54/XjXoITKp3jWqmBXMSP91nbsZWBEm0D/QaJty6Ynas)
+    password: ENC(WieV/oN3a24XpikcGDuLEnvEchJwlLU9QCldC3fCWkoABDHizUWBPfqJTfKYHbRg)
+    hikari:
+      connection-timeout: 3000
+      validation-timeout: 3000
+      minimum-idle: 6
+      max-lifetime: 240000
+      maximum-pool-size: 200
+    auto-commit: false
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      '[hibernate.default_batch_fetch_size]' : 100
+
+logging:
+  level:
+    '[kr.co.naamkbank]': INFO

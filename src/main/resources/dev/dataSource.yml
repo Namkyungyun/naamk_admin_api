@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:test;MODE=PostgreSQL
+    username : nk-test
+    password: bpmg-nk-test
+  hikari:
+    connection-timeout: 3000
+    validation-timeout: 3000
+    minimum-idle: 6
+    max-lifetime: 240000
+    maximum-pool-size: 200
+  auto-commit: false
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      '[hibernate.default_batch_fetch_size]' : 100
+      '[hibernate.format_sql]': true
+    show-sql: true
+    output:
+      ansi:
+        enabled: always
+
+logging:
+  level:
+    '[kr.co.naamkbank]': DEBUG

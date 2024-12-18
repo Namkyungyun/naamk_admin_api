@@ -1,0 +1,50 @@
+server:
+  port: 28080
+  shutdown: graceful
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+spring:
+  profiles:
+    active: local
+  application:
+    name: naamk-bank
+  config:
+    import:
+      - classpath:${spring.profiles.active}/dataSource.yml
+      - classpath:${spring.profiles.active}/jasypt.yml
+  main:
+    allow-bean-definition-overriding: true
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        enabled_lay_load_no_trans: false
+        jdbc:
+          time-zone: Asia/Seoul
+    show_sql: true
+    hibernate:
+      ddl-auto: none
+
+# key setup for encoding
+bank:
+  secure:
+    #bpmgbpmgbpmg
+    salt: 'YnBtZ2JwbWdicG1nYnBtZw=='
+    #PoplusWithBpmg
+    key: 'UG9wbHVzV2l0aEJwbWc='
+
+# sync & async setting
+sync:
+  base:
+    dir: /syncfiles
+  down:
+    dir: /syncfiles/syncfolders
+  thread:
+    pool: 5
+
+
+
