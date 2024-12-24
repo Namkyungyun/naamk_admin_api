@@ -10,7 +10,11 @@ import org.mapstruct.factory.Mappers;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    TbUsers userDtoToEntity(UserDto userDto);
+    TbUsers createRequestDtoToEntity(UserDto.CreateRequest dto);
 
-    UserDto.UserResponse entityToUserDto(TbUsers entity);
+    UserDto.ListResponse entityToListResponseDto(TbUsers entity);
+
+    UserDto.DetailResponse entityToDetailResponseDto(TbUsers entity);
+
+    TbUsers updateRequestDtoToEntity(UserDto.UpdateRequest dto);
 }

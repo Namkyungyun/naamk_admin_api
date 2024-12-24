@@ -1,32 +1,40 @@
 package kr.co.naamkbank.api.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 @Data
 @Builder
-@NoArgsConstructor @AllArgsConstructor
 public class UserDto {
-    private String userNm;
-    private String userEmail;
-    private String loginId;
-    private String loginPwd;
-    private UserRoleRequest roles;
 
     @Data @Builder
-    @AllArgsConstructor @NoArgsConstructor
-    public static class UserRoleRequest {
+    public static class CreateRequest {
+        private String userNm;
+        private String userEmail;
+        private String loginId;
+        private String loginPwd;
         private List<Long> roleIds;
     }
 
-    @Data
-    @NoArgsConstructor
-    public static class UserResponse {
+    @Data @Builder
+    public static class ListResponse {
+        private Long id;
+        private String userNm;
+        private String userEmail;
+        private String loginId;
+        private boolean activated;
+        private Timestamp lastLoginAt;
+        private Timestamp createdAt;
+        private Timestamp updatedAt;
+        private List<String> roleNames;
+
+    }
+
+    @Data @Builder
+    public static class DetailResponse {
         private Long id;
         private String userNm;
         private String userEmail;
@@ -39,4 +47,13 @@ public class UserDto {
         private Timestamp updatedAt;
         private List<RoleDto.RoleResponse> roles;
     }
+
+    @Data @Builder
+    public static class UpdateRequest {
+        private String userEmail;
+        private String loginPwd;
+        private boolean activated;
+        private List<Long> roleIds;
+    }
+
 }

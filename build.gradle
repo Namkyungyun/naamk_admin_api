@@ -53,7 +53,7 @@ dependencies {
 
     // Jasypt
     implementation "com.github.ulisesbocchio:jasypt-spring-boot-starter:${jasyptVersion}"
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+//    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // lombok
     compileOnly 'org.projectlombok:lombok'
