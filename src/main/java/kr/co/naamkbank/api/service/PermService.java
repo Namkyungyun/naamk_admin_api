@@ -2,7 +2,7 @@ package kr.co.naamkbank.api.service;
 
 import kr.co.naamkbank.api.dto.PermDto;
 import kr.co.naamkbank.api.dto.mapstruct.PermMapper;
-import kr.co.naamkbank.api.repository.PermRepository;
+import kr.co.naamkbank.api.repository.jpa.PermRepository;
 import kr.co.naamkbank.domain.TbPerms;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

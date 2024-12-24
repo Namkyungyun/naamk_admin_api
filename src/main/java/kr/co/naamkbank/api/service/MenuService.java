@@ -4,10 +4,9 @@ import kr.co.naamkbank.api.dto.MenuDto;
 import kr.co.naamkbank.api.dto.PermDto;
 import kr.co.naamkbank.api.dto.mapstruct.MenuMapper;
 import kr.co.naamkbank.api.dto.mapstruct.PermMapper;
-import kr.co.naamkbank.api.repository.MenuPermRepository;
-import kr.co.naamkbank.api.repository.MenuRepository;
-import kr.co.naamkbank.api.repository.PermRepository;
-import kr.co.naamkbank.api.repository.UserRepository;
+import kr.co.naamkbank.api.repository.jpa.MenuRepository;
+import kr.co.naamkbank.api.repository.jpa.PermRepository;
+import kr.co.naamkbank.api.repository.jpa.UserRepository;
 import kr.co.naamkbank.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,29 +22,26 @@ public class MenuService {
 
     private final MenuRepository menuRepository;
     private final PermRepository permRepository;
-    private final MenuPermRepository menuPermRepository;
     private final UserRepository userRepository;
 
     @Transactional
     public void createMenu(MenuDto.MenuRequest menuDto) {
         TbMenus menu = MenuMapper.INSTANCE.requestDtoToEntity(menuDto);
-        TbMenus savedEntity = menuRepository.save(menu);
+        menu.setMenuPerms(new ArrayList<>());
 
         for(Long permId : menuDto.getPermIds()) {
             TbPerms permEntity = permRepository.findById(permId).orElseThrow(()-> new NullPointerException("no perm"));
-            TbMenuPermIds compositeId = TbMenuPermIds.builder()
-                    .menuId(savedEntity.getId())
-                    .permId(permEntity.getId())
-                    .build();
 
             TbMenuPerm menuPermEntity = TbMenuPerm.builder()
-                    .id(compositeId)
-                    .menu(savedEntity)
+                    .menu(menu)
                     .perm(permEntity)
                     .build();
 
-            menuPermRepository.save(menuPermEntity);
+            menu.getMenuPerms().add(menuPermEntity);
         }
+
+        menuRepository.save(menu);
+
     }
 
     @Transactional(readOnly = true)

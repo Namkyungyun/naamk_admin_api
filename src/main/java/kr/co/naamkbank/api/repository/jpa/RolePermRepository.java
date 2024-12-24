@@ -1,4 +1,4 @@
-package kr.co.naamkbank.api.repository;
+package kr.co.naamkbank.api.repository.jpa;
 
 import kr.co.naamkbank.domain.TbRolePerm;
 import kr.co.naamkbank.domain.TbRolePermIds;
@@ -11,3 +11,5 @@ import java.util.List;
 public interface RolePermRepository extends JpaRepository<TbRolePerm, TbRolePermIds> {
     List<TbRolePerm> findAllByRoleId(Long roleId);
 }
+
+

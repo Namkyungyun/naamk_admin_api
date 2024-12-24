@@ -7,18 +7,16 @@ import lombok.*;
 @Table(name="tb_role_perm")
 @Getter @Setter @Builder
 @AllArgsConstructor @NoArgsConstructor
+@IdClass(TbRolePermIds.class)
 public class TbRolePerm {
-    @EmbeddedId
-    private TbRolePermIds id;
 
+    @Id
     @ManyToOne
-    @MapsId("roleId")
     @JoinColumn(name="role_id")
     private TbRoles role;
 
-
+    @Id
     @ManyToOne
-    @MapsId("permId")
     @JoinColumn(name="perm_id")
     private TbPerms perm;
 

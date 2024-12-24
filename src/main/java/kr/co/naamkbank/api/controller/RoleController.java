@@ -2,7 +2,6 @@ package kr.co.naamkbank.api.controller;
 
 import kr.co.naamkbank.api.dto.RoleDto;
 import kr.co.naamkbank.api.service.RoleService;
-import kr.co.naamkbank.domain.TbRoles;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +16,9 @@ public class RoleController {
     private final RoleService roleService;
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<Object> saveRole(@RequestBody RoleDto roleDto) {
+    public ResponseEntity<Object> saveRole(@RequestBody RoleDto.RoleRequest roleDto) {
         try {
-            TbRoles savedEntity = roleService.createRole(roleDto);
-            roleService.createRolePermission(savedEntity.getId(), roleDto.getRolePerms());
-
+            roleService.createRole(roleDto);
             return ResponseEntity.ok("OK");
 
         } catch(Exception e) {

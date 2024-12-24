@@ -1,4 +1,4 @@
-package kr.co.naamkbank.api.repository;
+package kr.co.naamkbank.api.repository.jpa;
 
 import kr.co.naamkbank.domain.TbPerms;
 import org.springframework.data.jpa.repository.JpaRepository;

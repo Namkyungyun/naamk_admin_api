@@ -10,5 +10,7 @@ import org.mapstruct.factory.Mappers;
 public interface RoleMapper {
     RoleMapper INSTANCE = Mappers.getMapper(RoleMapper.class);
 
+    TbRoles roleRequestDtoToEntity(RoleDto.RoleRequest dto);
+
     RoleDto.RoleResponse entityToRoleResponse(TbRoles entity);
 }

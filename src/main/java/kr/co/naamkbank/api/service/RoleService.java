@@ -4,7 +4,8 @@ import kr.co.naamkbank.api.dto.PermDto;
 import kr.co.naamkbank.api.dto.RoleDto;
 import kr.co.naamkbank.api.dto.mapstruct.PermMapper;
 import kr.co.naamkbank.api.dto.mapstruct.RoleMapper;
-import kr.co.naamkbank.api.repository.*;
+import kr.co.naamkbank.api.repository.jpa.PermRepository;
+import kr.co.naamkbank.api.repository.jpa.RoleRepository;
 import kr.co.naamkbank.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,51 +21,25 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final PermRepository permRepository;
-    private final RolePermRepository rolePermRepository;
 
     @Transactional
-    public TbRoles createRole(RoleDto role) {
-        return roleRepository.save(TbRoles.builder()
-                        .roleCd(role.getRoleCd())
-                        .roleNm(role.getRoleNm())
-                .build());
-    }
+    public void createRole(RoleDto.RoleRequest roleDto) {
+        TbRoles role = RoleMapper.INSTANCE.roleRequestDtoToEntity(roleDto);
+        role.setRolePerms(new ArrayList<>());
 
-    @Transactional
-    public void createRolePermission(Long roleId, RoleDto.RolePermRequest rolePermRequest) {
+        for(Long permId : roleDto.getPermIds()) {
+            TbPerms perm = permRepository.findById(permId).orElseThrow(()-> new NullPointerException("no perm"));
 
-        // get role entity
-        TbRoles role= roleRepository.findById(roleId)
-                .orElseThrow(() -> new NullPointerException("no role"));
-
-        // deleteAll existing role-perms
-        List<TbRolePerm> existingRolePerms = role.getRolePerms();
-        if(!existingRolePerms.isEmpty()) {
-            rolePermRepository.deleteAll(existingRolePerms);
-        }
-
-        // make role-perm entity list
-        List<TbRolePerm> list = new ArrayList<>();
-        for(Long permId : rolePermRequest.getPermIds()) {
-            // get perm entity
-            final TbPerms perm = permRepository.findById(permId).orElseThrow(()-> new NullPointerException("no perm"));
-
-            final TbRolePermIds compositeId = TbRolePermIds.builder()
-                    .roleId(role.getId())
-                    .permId(perm.getId())
-                    .build();
-
-            final TbRolePerm rolePerm = TbRolePerm.builder()
-                    .id(compositeId)
+            TbRolePerm rolePerm = TbRolePerm.builder()
                     .perm(perm)
                     .role(role)
                     .build();
 
-            list.add(rolePerm);
+            role.getRolePerms().add(rolePerm);
         }
 
-        // bulk insert
-        rolePermRepository.saveAll(list);
+        roleRepository.save(role);
+
     }
 
     @Transactional(readOnly = true)

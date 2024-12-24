@@ -1,4 +1,4 @@
-package kr.co.naamkbank.api.repository;
+package kr.co.naamkbank.api.repository.jpa;
 
 import kr.co.naamkbank.domain.TbMenuPerm;
 import kr.co.naamkbank.domain.TbMenuPermIds;

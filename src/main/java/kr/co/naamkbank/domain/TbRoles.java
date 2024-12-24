@@ -1,13 +1,11 @@
 package kr.co.naamkbank.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import kr.co.naamkbank.domain.audit.AuditEntity;
 import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name="tb_roles")
@@ -27,7 +25,6 @@ public class TbRoles extends AuditEntity {
     private String roleCd;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonIgnore
     private List<TbUserRole> userRoles = new ArrayList<>();
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

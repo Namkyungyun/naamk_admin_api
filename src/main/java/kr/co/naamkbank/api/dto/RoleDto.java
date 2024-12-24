@@ -7,21 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data @Builder
-@AllArgsConstructor @NoArgsConstructor
 public class RoleDto {
-    private String roleNm;
-    private String roleCd;
-    private RolePermRequest rolePerms;
-
 
     @Data @Builder
-    @AllArgsConstructor @NoArgsConstructor
-    public static class RolePermRequest implements Serializable {
+    public static class RoleRequest {
+        private String roleNm;
+        private String roleCd;
         private List<Long> permIds;
     }
 
-    @Data
-    @NoArgsConstructor
+    @Data @Builder
     public static class RoleResponse implements Serializable {
         private Long id;
         private String roleNm;

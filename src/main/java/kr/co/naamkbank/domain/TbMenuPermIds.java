@@ -1,15 +1,26 @@
 package kr.co.naamkbank.domain;
 
-import jakarta.persistence.Embeddable;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.Objects;
 
-@Embeddable
 @Getter @Setter
-@AllArgsConstructor @NoArgsConstructor
-@Builder
 public class TbMenuPermIds implements Serializable {
-    private Long menuId;
-    private Long permId;
+    private Long menu;
+    private Long perm;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TbMenuPermIds that = (TbMenuPermIds) o;
+        return Objects.equals(menu, that.getMenu()) &&
+                Objects.equals(perm, that.getPerm());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(menu, perm);
+    }
 }
