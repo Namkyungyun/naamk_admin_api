@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ENC(TYbWONRpnK+eUGe+DGNB0ukuV5EvhAqhFqF+BQOesiB0LKWmPsE9VvofDhosDrceTEVfufigtoEbnDywF3QMWHVjy5h6TvlKsTPKUJIlrMRnRTyTANSXiFQMokbtgdQXZaF+MgIo/G46TdLKaqTO/w==)
+    url: ENC(0CkDvUs30WpR/oYzawpbXO4Z1o+/MXzTkcBjdKiVo+0Bi7fisOhzZeYKwob1QqtV+ZbPgT+9GqZGAu4pN6smOm7R+e9LRT5lHDYRL5Zer28ZiPAj7jtm6cU0IWGXTqvKD4CjtOO1v12XRpRuyPsywq757nPsh7cTispc1MQt/oQLqIc8hkEszt95BJkDwq7x)
     username : ENC(BzQK0/38GkerJgfs8ILakyvTbKznpHwQyMzR12UDHvCMSMhjPerCR7pociI/5MGb)
     password: ENC(lnsSMnBSRJNSUisnaVVMLNov5Au5cJw2oQCsllyqErQMTDWSqIZIEjAVxTQ3MFWs)
     hikari:
@@ -14,7 +14,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
     properties:
       '[hibernate.default_batch_fetch_size]' : 100

@@ -1,0 +1,27 @@
+package kr.co.naamkbank.domain;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.Comment;
+
+@Entity @Table(name="tb_menu_perm")
+@Getter @Setter
+@AllArgsConstructor @NoArgsConstructor
+@Builder
+public class TbMenuPerm {
+    @EmbeddedId
+    private TbMenuPermIds id;
+
+    @ManyToOne
+    @MapsId("menuId")
+    @JoinColumn(name = "menu_id")
+    @Comment("메뉴 고유 ID")
+    private TbMenus menu;
+
+
+    @ManyToOne
+    @MapsId("permId")
+    @JoinColumn(name="perm_id")
+    @Comment("권한 고유 ID")
+    private TbPerms perm;
+}

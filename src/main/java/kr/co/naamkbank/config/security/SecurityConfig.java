@@ -13,7 +13,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**").permitAll() // H2 Console 접근 허용
+                        .requestMatchers("/**").permitAll()
+//                        .requestMatchers("/h2-console/**").permitAll() // H2 Console 접근 허용
+//                        .requestMatchers("/user/**").permitAll() // H2 Console 접근 허용
                         .anyRequest().authenticated() // 다른 요청은 인증 필요
                 )
                 .csrf(AbstractHttpConfigurer::disable) // H2 Console 사용 시 CSRF 비활성화

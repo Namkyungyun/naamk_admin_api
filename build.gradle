@@ -19,6 +19,10 @@ configurations {
     }
 }
 
+ext {
+    mapstructVersion = "1.5.5.Final"
+}
+
 repositories {
     mavenCentral()
 }
@@ -39,12 +43,17 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
 }
 
 tasks.named('test') {
