@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface RolePermRepository extends JpaRepository<TbRolePerm, TbRolePermIds> {
     List<TbRolePerm> findAllByRoleId(Long roleId);
 }

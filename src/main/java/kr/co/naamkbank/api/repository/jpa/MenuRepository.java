@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface MenuRepository extends JpaRepository<TbMenus, Long> {
     //최상위 메뉴 가져오기
     @Query(nativeQuery = true,

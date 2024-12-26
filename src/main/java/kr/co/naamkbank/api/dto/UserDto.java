@@ -10,6 +10,14 @@ import java.util.List;
 @Builder
 public class UserDto {
 
+    @Data
+    public static class SearchParam {
+        private String userNm;
+        private String userEmail;
+        private String loginId;
+        private Long roleId;
+    }
+
     @Data @Builder
     public static class CreateRequest {
         private String userNm;
@@ -29,7 +37,7 @@ public class UserDto {
         private Timestamp lastLoginAt;
         private Timestamp createdAt;
         private Timestamp updatedAt;
-        private List<String> roleNames;
+        private List<RoleDto.RoleResponse> roles;
 
     }
 

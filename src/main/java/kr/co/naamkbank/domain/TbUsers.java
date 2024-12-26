@@ -1,6 +1,5 @@
 package kr.co.naamkbank.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import kr.co.naamkbank.domain.audit.AuditEntity;
 import lombok.*;
@@ -51,6 +50,11 @@ public class TbUsers extends AuditEntity {
         if (this.pwdExpiredAt == null) {
             this.pwdExpiredAt = Timestamp.valueOf(LocalDateTime.now().plusDays(90));
         }
+    }
+
+    public void removeUserRole(TbUserRole userRole) {
+        userRoles.remove(userRole);
+        userRole.setUser(null);
     }
 
 }
