@@ -21,4 +21,4 @@ spring:
 
 logging:
   level:
-    '[kr.co.naamkbank]': INFO
+    '[kr.co.naamk]': INFO

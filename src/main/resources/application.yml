@@ -29,7 +29,7 @@ spring:
         enabled_lay_load_no_trans: false
         jdbc:
           time-zone: Asia/Seoul
-    show_sql: true
+    show_sql: false
     hibernate:
       ddl-auto: none
 

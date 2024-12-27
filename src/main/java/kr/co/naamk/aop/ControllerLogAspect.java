@@ -21,6 +21,10 @@ import java.util.regex.Pattern;
 @Component
 public class ControllerLogAspect {
 
+    final String CALLING_ARROW = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
+    final String END_ARROW = "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+    private final String SPACE = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
+
     @Pointcut("execution(* kr.co.naamk.api.controller..*(..))")
     public void allController() {}
 
@@ -35,35 +39,33 @@ public class ControllerLogAspect {
 
             // ipAddress
             String ipAddress = getIpAddress(request);
-            commonStr.append("[ipAddress] ").append(ipAddress).append("\n");
+            commonStr.append(SPACE).append("[ipAddress] ").append(ipAddress).append("\n");
             
             // httpMethod & requestAPI uri
             String httpMethod = request.getMethod();
             String requestURI = request.getRequestURI();
-            commonStr.append("[requestURI] ").append(httpMethod).append(" ").append(requestURI).append("\n");
+            commonStr.append(SPACE).append("[requestURI] ").append(httpMethod).append(" ").append(requestURI).append("\n");
         }
 
         try {
             /** 비즈니스 로직으로 연결되기 전 inbound 정보 log 남기기
              * 로그 규격
-             *  [dateTime] >>>>>>>>>> CAllING
              *  [request API] {httpMethod} {api uri}
              *  [request ARGS] {request args}
              * */
             String beforeMessage = commonStr + getRequestArgs(joinPoint);
-            log.info(">>>>>>>>>> CALLING {}\n{}", getNow(), beforeMessage);
+            log.info("{} CALLING {}\n{}", CALLING_ARROW, getNow(), beforeMessage);
 
             result = (ResponseEntity<?>) joinPoint.proceed();
 
             /** 비즈니스 로직 연결 이후 성공 케이스에 대한 log 남기기
              * 로그 규격
-             *  [dateTime] <<<<<<<<<< COMPLETED
              *  [request IpAddress] {ipAddress}
              *  [request API] {httpMethod} {api uri}
              *  [response MSG] {response msg}
              * */
             String afterMessage = commonStr + getResponseMessage(result);
-            log.info("<<<<<<<<<< COMPLETED {}\n{}", getNow(), afterMessage);
+            log.info("{} COMPLETED {}\n{}", END_ARROW, getNow(), afterMessage);
 
 
             return result;
@@ -71,14 +73,13 @@ public class ControllerLogAspect {
         } catch(Exception e) {
             /** 비즈니스 로직 연결 이후 예외 케이스에 대한 log 남기기
              * 로그 규격
-             *  [dateTime] <<<<<<<<<< COMPLETED
              *  [request IpAddress] {ipAddress}
              *  [request API] {httpMethod} {api uri}
              *  [response MSG] {response msg}
              * */
             String exMessage = commonStr + getExceptionMessage(result, e);
 
-            log.error("<<<<<<<<<< COMPLETED {}\n{}", getNow(), exMessage);
+            log.error("{} EXCEPTION {}\n{}", END_ARROW, getNow(), exMessage);
 
             throw e;
         }
@@ -146,7 +147,7 @@ public class ControllerLogAspect {
         int argsCount = args.length;
 
         if(argsCount > 0) {
-            sb.append("[arguments] ");
+            sb.append(SPACE).append("[arguments] ");
 
             for(Object o : joinPoint.getArgs()) {
                 sb.append("<").append(o.getClass().getSimpleName()).append("> ");
@@ -163,16 +164,16 @@ public class ControllerLogAspect {
         StringBuilder sb = new StringBuilder();
 
         HttpStatusCode statusCode = result.getStatusCode();
-        sb.append("[result]").append("\n");
-        sb.append("\t- return code : ").append(statusCode.value()).append("\n");
+        sb.append(SPACE).append("[result]").append("\n");
+        sb.append(SPACE).append("\t- return code : ").append(statusCode.value()).append("\n");
 
         Object body = Objects.requireNonNull(result.getBody());
 
         if(body instanceof String) {
-            sb.append("\t- return val : ").append(body);
+            sb.append(SPACE).append("\t- return val : ").append(body);
         } else {
             String name = body.getClass().getName();
-            sb.append("\t- return val : ").append(name);
+            sb.append(SPACE).append("\t- return val : ").append(name);
         }
 
         return sb.toString();
@@ -184,15 +185,15 @@ public class ControllerLogAspect {
         // status code
         if(result != null) {
             HttpStatusCode statusCode = result.getStatusCode();
-            sb.append("[result]").append("\n");
-            sb.append("\t- return code : ").append(statusCode.value()).append("\n");
+            sb.append(SPACE).append("[result]").append("\n");
+            sb.append(SPACE).append("\t- return code : ").append(statusCode.value()).append("\n");
         }
 
         // error message
         String message = e.getMessage();
         String exceptionType = e.getClass().getName();
-        sb.append("\t- error type : ").append(exceptionType).append("\n");
-        sb.append("\t- error msg : ").append(message).append("\n");
+        sb.append(SPACE).append("\t- error type : ").append(exceptionType).append("\n");
+        sb.append(SPACE).append("\t- error msg : ").append(message).append("\n");
 
         return sb.toString();
     }
