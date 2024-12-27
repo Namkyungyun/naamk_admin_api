@@ -1,5 +1,6 @@
 package kr.co.naamk.api.service;
 
+import jakarta.validation.constraints.Null;
 import kr.co.naamk.api.dto.UserDto;
 import kr.co.naamk.api.dto.mapstruct.UserMapper;
 import kr.co.naamk.api.repository.jpa.RoleRepository;
@@ -39,7 +40,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserDto.DetailResponse getUserDetailById(Long userId) {
 
-        TbUsers user = userRepository.findById(userId).orElse(null);
+        TbUsers user = userRepository.findById(userId).orElseThrow(() -> new NullPointerException("no user"));
 
         return UserMapper.INSTANCE.entityToDetailResponseDto(user);
     }
