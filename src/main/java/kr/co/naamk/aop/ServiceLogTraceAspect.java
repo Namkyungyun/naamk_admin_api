@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class ServiceLogTraceAspect {
     private final LogTrace logTrace;
 
-    @Pointcut("execution(* kr.co.naamk.api..*(..))")
+    @Pointcut("execution(* kr.co.naamk.web..*(..))")
     public void allAPI() {}
 
     @Pointcut("execution(* kr.co.naamk.config.security..*(..))")

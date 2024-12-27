@@ -25,7 +25,7 @@ public class ControllerLogAspect {
     final String END_ARROW = "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
     private final String SPACE = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
 
-    @Pointcut("execution(* kr.co.naamk.api.controller..*(..))")
+    @Pointcut("execution(* kr.co.naamk.web.controller..*(..))")
     public void allController() {}
 
     @Around("allController()")
