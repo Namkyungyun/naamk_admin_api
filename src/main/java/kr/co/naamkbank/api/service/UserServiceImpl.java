@@ -4,7 +4,6 @@ import kr.co.naamkbank.api.dto.UserDto;
 import kr.co.naamkbank.api.dto.mapstruct.UserMapper;
 import kr.co.naamkbank.api.repository.jpa.RoleRepository;
 import kr.co.naamkbank.api.repository.jpa.UserRepository;
-import kr.co.naamkbank.api.repository.jpa.UserRoleRepository;
 import kr.co.naamkbank.api.repository.queryDSL.UserQueryRepository;
 import kr.co.naamkbank.domain.*;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ public class UserServiceImpl implements UserService {
     private final UserQueryRepository userQueryRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final UserRoleRepository userRoleRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -52,9 +50,16 @@ public class UserServiceImpl implements UserService {
     public void createUser(UserDto.CreateRequest userDto) {
 
         TbUsers user = UserMapper.INSTANCE.createRequestDtoToEntity(userDto);
-        user.setUserRoles(getUserRoles(user, userDto.getRoleIds()));
+        user.setUserRoles(makeUserRoles(user, userDto.getRoleIds()));
 
         userRepository.save(user);
+    }
+
+    @Override
+    public void deleteUser(Long userId) {
+        // 연관관계 삭제
+        TbUsers user = userRepository.findById(userId).orElseThrow(() -> new NullPointerException("no user"));
+        userRepository.delete(user);
     }
 
 
@@ -106,17 +111,18 @@ public class UserServiceImpl implements UserService {
 
         if(roleIds != null && !roleIds.isEmpty() && !roleIds.equals(savedRoleIds)) {
             // 연관 관계에서 삭제
-            removeUserRoleInUser(user);
+            deleteUserRoleInUser(user);
 
             // 새로운 userRole
-            user.getUserRoles().addAll(getUserRoles(user, roleIds));
+            user.getUserRoles().addAll(makeUserRoles(user, roleIds));
 
             // user 테이블 updated_at 강제 진행
             user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
         }
     }
 
-    private void removeUserRoleInUser(TbUsers user) {
+    /* delete private function */
+    private void deleteUserRoleInUser(TbUsers user) {
         List<TbUserRole> userRoles = new ArrayList<>(user.getUserRoles()); // ConcurrentModificationException 방지
 
         for(TbUserRole userRole : userRoles) {
@@ -125,7 +131,8 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private List<TbUserRole> getUserRoles(TbUsers user, List<Long> roleIds) {
+    /* get & make new instance private function */
+    private List<TbUserRole> makeUserRoles(TbUsers user, List<Long> roleIds) {
         List<TbUserRole> result = new ArrayList<>();
 
         for(Long roleId : roleIds) {

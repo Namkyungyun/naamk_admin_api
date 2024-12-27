@@ -54,4 +54,16 @@ public class UserController {
             throw e;
         }
     }
+
+    @RequestMapping(value="/{userId}", method = RequestMethod.DELETE)
+    public ResponseEntity<Object> deleteUser(@PathVariable Long userId) {
+
+        try {
+            userService.deleteUser(userId);
+
+            return ResponseEntity.ok("OK");
+        } catch(Exception e) {
+            throw e;
+        }
+    }
 }
