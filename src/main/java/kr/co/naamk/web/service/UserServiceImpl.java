@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDto.DetailResponse getUserDetailById(Long userId) throws ServiceException {
+    public UserDto.DetailResponse getUserDetailById(Long userId) {
 
         TbUsers user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ServiceMessageType.USER_NOT_FOUND));
 

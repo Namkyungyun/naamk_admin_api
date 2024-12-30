@@ -73,7 +73,7 @@ public class UserController {
     }
 
     @RequestMapping(value="/{userId}", method = RequestMethod.DELETE)
-    public Object deleteUser(@PathVariable Long userId, HttpServletRequest request) throws Throwable{
+    public Object deleteUser(@PathVariable Long userId, HttpServletRequest request) {
 
         userService.deleteUser(userId);
 
