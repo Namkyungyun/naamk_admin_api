@@ -149,6 +149,10 @@ public class ControllerLogAspect {
             sb.append(SPACE).append("[arguments] ");
 
             for(Object o : joinPoint.getArgs()) {
+                if(o == null) {
+                    continue;
+                }
+
                 sb.append("<").append(o.getClass().getSimpleName()).append("> ");
                 sb.append(o.getClass().getSimpleName());
                 sb.append(", ");
@@ -168,8 +172,13 @@ public class ControllerLogAspect {
         sb.append(SPACE).append("\t- return code : ").append(statusCode).append("\n");
 
         // body
-        Object body = Objects.requireNonNull(result.getBody());
-        String name = body.getClass().getName();
+        Object body = result.getBody().getEntity();
+
+        String name = "";
+        if(body != null) {
+            name = body.getClass().getName();
+        }
+
         sb.append(SPACE).append("\t- return val : ").append(name);
 
         return sb.toString();
