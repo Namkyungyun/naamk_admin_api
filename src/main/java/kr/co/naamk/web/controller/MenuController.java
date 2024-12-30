@@ -1,6 +1,9 @@
 package kr.co.naamk.web.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import kr.co.naamk.exception.type.ServiceMessageType;
 import kr.co.naamk.web.dto.MenuDto;
+import kr.co.naamk.web.dto.apiResponse.APIResponseEntityBuilder;
 import kr.co.naamk.web.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,30 +18,37 @@ public class MenuController {
     private final MenuService menuService;
 
     @RequestMapping(value="", method = RequestMethod.POST)
-    public ResponseEntity<Object> createMenu(@RequestBody MenuDto.MenuRequest dto) {
-        try {
-            menuService.createMenu(dto);
-            return ResponseEntity.ok("OK");
-        } catch(Exception e) {
-            throw e;
-        }
+    public Object createMenu(@RequestBody MenuDto.MenuRequest dto,
+                             HttpServletRequest request) {
+        menuService.createMenu(dto);
+
+        return APIResponseEntityBuilder.create().service(request)
+                .resultMessage(ServiceMessageType.SUCCESS)
+                .build();
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<Object> getMenusByMenuId(@RequestParam(required = false) Long menuId) {
-        try {
-            List<MenuDto.MenuTreeDetailResponse> menus = menuService.getMenusByMenuId(menuId);
-            return ResponseEntity.ok(menus);
-        } catch(Exception e) {
-            throw e;
-        }
+    public Object getMenusByMenuId(@RequestParam(required = false) Long menuId,
+                                                   HttpServletRequest request) {
+
+        List<MenuDto.MenuTreeDetailResponse> menus = menuService.getMenusByMenuId(menuId);
+
+        return APIResponseEntityBuilder.create().service(request)
+                .resultMessage(ServiceMessageType.SUCCESS)
+                .entity(menus)
+                .build();
     }
 
     @RequestMapping(value="/tree", method = RequestMethod.GET)
-    public ResponseEntity<Object> getMenusTree(@RequestParam(required = true) Long userId) {
+    public Object getMenusTree(@RequestParam Long userId,
+                               HttpServletRequest request) {
+
         List<MenuDto.MenuTreeResponse> menusByUserId = menuService.getDisplayMenuTreeByUserId(userId);
 
-        return ResponseEntity.ok(menusByUserId);
+        return APIResponseEntityBuilder.create().service(request)
+                .resultMessage(ServiceMessageType.SUCCESS)
+                .entity(menusByUserId)
+                .build();
     }
 
 }
