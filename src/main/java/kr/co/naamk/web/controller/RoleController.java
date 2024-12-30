@@ -1,6 +1,9 @@
 package kr.co.naamk.web.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import kr.co.naamk.exception.type.ServiceMessageType;
 import kr.co.naamk.web.dto.RoleDto;
+import kr.co.naamk.web.dto.apiResponse.APIResponseEntityBuilder;
 import kr.co.naamk.web.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,26 +19,26 @@ public class RoleController {
     private final RoleService roleService;
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<Object> saveRole(@RequestBody RoleDto.RoleRequest roleDto) {
-        try {
-            roleService.createRole(roleDto);
-            return ResponseEntity.ok("OK");
+    public Object saveRole(@RequestBody RoleDto.RoleRequest roleDto,
+                           HttpServletRequest request) {
 
-        } catch(Exception e) {
-            throw e;
-        }
+        roleService.createRole(roleDto);
+
+        return APIResponseEntityBuilder.create().service(request)
+                .resultMessage(ServiceMessageType.SUCCESS)
+                .build();
     }
 
     @RequestMapping(value="", method = RequestMethod.GET)
-    public ResponseEntity<Object> getRoles(@RequestParam(required = false) Long roleId) {
-        try {
-            List<RoleDto.RoleResponse> list = roleService.getRoles(roleId);
+    public Object getRoles(@RequestParam(required = false) Long roleId,
+                           HttpServletRequest request) {
 
-            Object result = (roleId != null) ? list.getFirst() : list;
+        List<RoleDto.RoleResponse> list = roleService.getRoles(roleId);
+        Object result = (roleId != null) ? list.getFirst() : list;
 
-            return ResponseEntity.ok(result);
-        } catch(Exception e) {
-            throw e;
-        }
+        return APIResponseEntityBuilder.create().service(request)
+                .resultMessage(ServiceMessageType.SUCCESS)
+                .entity(result)
+                .build();
     }
 }
