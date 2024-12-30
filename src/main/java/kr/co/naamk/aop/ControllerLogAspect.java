@@ -12,7 +12,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -38,12 +37,12 @@ public class ControllerLogAspect {
 
             // ipAddress
             String ipAddress = getIpAddress(request);
-            commonStr.append(SPACE).append("[ipAddress] ").append(ipAddress).append("\n");
+            commonStr.append(SPACE).append("* ipAddress : ").append(ipAddress).append("\n");
             
             // httpMethod & requestAPI uri
             String httpMethod = request.getMethod();
             String requestURI = request.getRequestURI();
-            commonStr.append(SPACE).append("[requestURI] ").append(httpMethod).append(" ").append(requestURI).append("\n");
+            commonStr.append(SPACE).append("* requestURI : ").append(httpMethod).append(" ").append(requestURI).append("\n");
         }
 
         try {
@@ -52,8 +51,8 @@ public class ControllerLogAspect {
              *  [request API] {httpMethod} {api uri}
              *  [request ARGS] {request args}
              * */
-            String beforeMessage = commonStr + getRequestArgs(joinPoint);
-            log.info("{} CALLING {}\n{}", CALLING_ARROW, getNow(), beforeMessage);
+            String beforeMessage = commonStr + getRequestInfo(joinPoint);
+            log.info("{} CALLING \n{}", CALLING_ARROW, beforeMessage);
 
             result = (APIResponse) joinPoint.proceed();
 
@@ -78,10 +77,15 @@ public class ControllerLogAspect {
              * */
             String exMessage = commonStr + getExceptionMessage(result, e);
 
-            log.error("{} EXCEPTION {}\n{}", END_ARROW, getNow(), exMessage);
+            log.error("{} EXCEPTION \n{}", END_ARROW, exMessage);
 
             throw e;
         }
+    }
+
+    @AfterThrowing(pointcut = "allController()", throwing = "ex")
+    public void logExceptionAndRethrow(Exception ex) throws Exception {
+        throw ex; // 예외를 다시 던짐 -> APIExceptionHandler 가도록
     }
 
 
@@ -138,15 +142,18 @@ public class ControllerLogAspect {
         return dateFormat.format(System.currentTimeMillis());
     }
 
-    private String getRequestArgs(ProceedingJoinPoint joinPoint) {
+    private String getRequestInfo(ProceedingJoinPoint joinPoint) {
         StringBuilder sb = new StringBuilder();
+
+        // request time
+        sb.append(SPACE).append("* date : ").append(getNow()).append("\n");
 
         // request arguments
         Object[] args = joinPoint.getArgs();
         int argsCount = args.length;
 
         if(argsCount > 0) {
-            sb.append(SPACE).append("[arguments] ");
+            sb.append(SPACE).append("* arguments : ");
 
             for(Object o : joinPoint.getArgs()) {
                 if(o == null) {
@@ -168,7 +175,7 @@ public class ControllerLogAspect {
 
         // status code
         Integer statusCode = result.getHeader().getResultCode();
-        sb.append(SPACE).append("[result]").append("\n");
+        sb.append(SPACE).append("* result : ").append("\n");
         sb.append(SPACE).append("\t- return code : ").append(statusCode).append("\n");
 
         // body
@@ -190,13 +197,13 @@ public class ControllerLogAspect {
         // status code
         if(result != null) {
             Integer statusCode = result.getHeader().getResultCode();
-            sb.append(SPACE).append("[result]").append("\n");
+            sb.append(SPACE).append("* result : ").append("\n");
             sb.append(SPACE).append("\t- return code : ").append(statusCode).append("\n");
         }
 
         // error message
-        String message = e.getMessage();
-        String exceptionType = e.getClass().getName();
+        String message = e.getMessage() != null ? e.getMessage() : e.toString();
+        String exceptionType = e.getClass().getSimpleName();
         sb.append(SPACE).append("\t- error type : ").append(exceptionType).append("\n");
         sb.append(SPACE).append("\t- error msg : ").append(message).append("\n");
 

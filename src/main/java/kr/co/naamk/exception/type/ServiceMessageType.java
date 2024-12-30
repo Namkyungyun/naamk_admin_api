@@ -7,14 +7,15 @@ import lombok.Getter;
 @Getter
 public enum ServiceMessageType {
     SUCCESS(200, "SUCCESS"),
-    NOT_DEFINED_ERROR( 9999, "정의 되지 않은 ERROR 입니다." ),
+    NOT_DEFINED_ERROR( 9999, "This is an undefined ERROR." ),
 
     ERROR_SQL( 906, " SQL Error" ),
     ERROR_IO( 907, "Server IO Error" ),
     ERROR_DATA_CONVERT(908, "Data Convert Error"),
+    ERROR_NULL_DATA(909, "Null value encountered during mapping"),
 
-    REQUEST_PARAM_ERROR( 1303, "요청 parameter 정보가 잘못되어있습니다." ),
-    REQUEST_ENTITY_TYPE_ERROR( 1304, "요청 Entity Type이 맞지 않습니다." ),
+    REQUEST_PARAM_ERROR( 1303, "The requested parameter was invalid." ),
+    REQUEST_ENTITY_TYPE_ERROR( 1304, "The requested Entity Type does not match." ),
 
 
     // authorization
@@ -23,10 +24,10 @@ public enum ServiceMessageType {
 
 
     // entity not found
-    USER_NOT_FOUND(3001, "USER_NOT_FOUND"),
-    ROLE_NOT_FOUND(3002, "ROLE_NOT_FOUND"),
-    PERMISSION_NOT_FOUND(3003, "PERMISSION_NOT_FOUND"),
-    MENU_NOT_FOUND(3004, "MENU_NOT_FOUND"),
+    USER_NOT_FOUND(3001, "The requested user was not found."),
+    ROLE_NOT_FOUND(3002, "The requested role was not found."),
+    PERMISSION_NOT_FOUND(3003, "The requested permission was not found."),
+    MENU_NOT_FOUND(3004, "The requested menu was not found."),
 
     ;
 

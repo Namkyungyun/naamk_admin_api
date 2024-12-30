@@ -20,30 +20,32 @@ public class ServiceLogTraceAspect {
     private final LogTrace logTrace;
 
     @Pointcut("execution(* kr.co.naamk.web..*(..))")
-    public void allAPI() {}
+    private void allAPI() {}
 
     @Pointcut("execution(* kr.co.naamk.config.security..*(..))")
-    public void securityConfig() {}
+    private void securityConfig() {}
 
 //    @Pointcut("within(com.flyff.universe.utils.TokenProvider)")
 //    public void tokenProvider() {}
 
 
-//    @Around("allAPI() || tokenProvider() || securityConfig()")
     @Around("allAPI() || securityConfig()")
     public Object traceLog(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        String targetName = getTargetName(joinPoint);
-
         LogTraceStatus status = null;
+
         try {
+            String targetName = getTargetName(joinPoint);
+
             status = logTrace.begin(targetName);
             Object result = joinPoint.proceed();
             logTrace.end(status);
 
             return result;
+
         } catch(Exception e) {
             logTrace.exception(status, e);
+
             throw  e;
         }
     }
@@ -60,7 +62,6 @@ public class ServiceLogTraceAspect {
                 break;
             }
         }
-
 
         return targetName;
 
