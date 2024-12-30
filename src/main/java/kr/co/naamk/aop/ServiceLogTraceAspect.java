@@ -32,11 +32,12 @@ public class ServiceLogTraceAspect {
 //    @Around("allAPI() || tokenProvider() || securityConfig()")
     @Around("allAPI() || securityConfig()")
     public Object traceLog(ProceedingJoinPoint joinPoint) throws Throwable {
-        String callingMethod = joinPoint.getSignature().toShortString();
+
+        String targetName = getTargetName(joinPoint);
 
         LogTraceStatus status = null;
         try {
-            status = logTrace.begin(callingMethod);
+            status = logTrace.begin(targetName);
             Object result = joinPoint.proceed();
             logTrace.end(status);
 
@@ -45,5 +46,23 @@ public class ServiceLogTraceAspect {
             logTrace.exception(status, e);
             throw  e;
         }
+    }
+
+
+    private String getTargetName(ProceedingJoinPoint joinPoint) {
+        Class<?>[] interfaces = joinPoint.getTarget().getClass().getInterfaces();
+        String targetName = joinPoint.getSignature().toShortString();
+
+        // CrudRepository 하위 인터페이스를 찾기
+        for (Class<?> iface : interfaces) {
+            if (org.springframework.data.repository.CrudRepository.class.isAssignableFrom(iface)) {
+                targetName = iface.getSimpleName() + "." + joinPoint.getSignature().getName();;
+                break;
+            }
+        }
+
+
+        return targetName;
+
     }
 }
