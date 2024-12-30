@@ -1,5 +1,7 @@
 package kr.co.naamk.web.service;
 
+import kr.co.naamk.exception.ServiceException;
+import kr.co.naamk.exception.type.ServiceMessageType;
 import kr.co.naamk.web.dto.UserDto;
 import kr.co.naamk.web.dto.mapstruct.UserMapper;
 import kr.co.naamk.web.repository.jpa.RoleRepository;
@@ -37,9 +39,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDto.DetailResponse getUserDetailById(Long userId) {
+    public UserDto.DetailResponse getUserDetailById(Long userId) throws ServiceException {
 
-        TbUsers user = userRepository.findById(userId).orElseThrow(() -> new NullPointerException("no user"));
+        TbUsers user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ServiceMessageType.USER_NOT_FOUND));
 
         return UserMapper.INSTANCE.entityToDetailResponseDto(user);
     }
@@ -58,7 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long userId) {
         // 연관관계 삭제
-        TbUsers user = userRepository.findById(userId).orElseThrow(() -> new NullPointerException("no user"));
+        TbUsers user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ServiceMessageType.USER_NOT_FOUND));
         userRepository.delete(user);
     }
 
@@ -66,7 +68,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateUser(Long userId, UserDto.UpdateRequest userDto) {
-        TbUsers user = userRepository.findById(userId).orElseThrow(()-> new NullPointerException("no user"));
+        TbUsers user = userRepository.findById(userId).orElseThrow(()-> new ServiceException(ServiceMessageType.USER_NOT_FOUND));
 
         // user email
         updateUserEmail(user, userDto.getUserEmail());
