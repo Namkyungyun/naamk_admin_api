@@ -1,6 +1,11 @@
 package kr.co.naamk.web.controller;
 
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import kr.co.naamk.exception.type.ServiceMessageType;
 import kr.co.naamk.web.dto.UserDto;
+import kr.co.naamk.web.dto.apiResponse.APIResponseBuilder;
+import kr.co.naamk.web.dto.apiResponse.APIResponseEntityBuilder;
 import kr.co.naamk.web.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -18,52 +26,59 @@ public class UserController {
     private final UserService userService;
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public ResponseEntity<Object> getUsersBySearch(@RequestBody UserDto.SearchParam searchDto,
-                                                   Pageable pageable) {
+    public Object getUsersBySearch(@RequestBody UserDto.SearchParam searchDto, Pageable pageable,
+                                   HttpServletRequest request) {
+
         Page<UserDto.ListResponse> users = userService.getUsersBySearch(searchDto, pageable);
 
-        return ResponseEntity.ok(users);
+        return APIResponseEntityBuilder.create().service(request)
+                .resultMessage(ServiceMessageType.SUCCESS)
+                .entity(users)
+                .build();
 
     }
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
-    public ResponseEntity<Object> getUserDetail(@PathVariable Long userId) {
+    public Object getUserDetail(@PathVariable Long userId, HttpServletRequest request) {
+
         UserDto.DetailResponse userDetail = userService.getUserDetailById(userId);
 
-        return ResponseEntity.ok(userDetail);
+        return APIResponseEntityBuilder.create().service(request)
+                        .resultMessage(ServiceMessageType.SUCCESS)
+                        .entity(userDetail)
+                        .build();
     }
 
     @RequestMapping(value="", method = RequestMethod.POST)
-    public ResponseEntity<Object> createUser(@RequestBody UserDto.CreateRequest userDto) {
-        try{
-            userService.createUser(userDto);
-            return ResponseEntity.ok("OK");
-        } catch(Exception e) {
-            throw e;
-        }
+    public Object createUser(@RequestBody UserDto.CreateRequest userDto,
+                                             HttpServletRequest request) {
+        userService.createUser(userDto);
+
+        return APIResponseEntityBuilder.create().service(request)
+                .resultMessage(ServiceMessageType.SUCCESS)
+                .build();
     }
 
     @RequestMapping(value="/{userId}", method = RequestMethod.PUT)
-    public ResponseEntity<Object> updateUser(@PathVariable Long userId,
-                                             @RequestBody UserDto.UpdateRequest userDto) {
-        try {
-            userService.updateUser(userId, userDto);
-            return ResponseEntity.ok("OK");
+    public Object updateUser(@PathVariable Long userId,
+                             @RequestBody UserDto.UpdateRequest userDto,
+                             HttpServletRequest request) {
 
-        } catch(Exception e) {
-            throw e;
-        }
+        userService.updateUser(userId, userDto);
+
+        return APIResponseEntityBuilder.create().service(request)
+                .resultMessage(ServiceMessageType.SUCCESS)
+                .build();
+
     }
 
     @RequestMapping(value="/{userId}", method = RequestMethod.DELETE)
-    public ResponseEntity<Object> deleteUser(@PathVariable Long userId) {
+    public Object deleteUser(@PathVariable Long userId, HttpServletRequest request) {
 
-        try {
-            userService.deleteUser(userId);
+        userService.deleteUser(userId);
 
-            return ResponseEntity.ok("OK");
-        } catch(Exception e) {
-            throw e;
-        }
+        return APIResponseEntityBuilder.create().service(request)
+                .resultMessage(ServiceMessageType.SUCCESS)
+                .build();
     }
 }
