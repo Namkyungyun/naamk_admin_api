@@ -1,11 +1,10 @@
 package kr.co.naamk.aop;
 
 import jakarta.servlet.http.HttpServletRequest;
+import kr.co.naamk.web.dto.apiResponse.APIResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -32,7 +31,7 @@ public class ControllerLogAspect {
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
         StringBuilder commonStr = new StringBuilder();
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        ResponseEntity<?> result = null;
+        APIResponse result = null;
 
         if(requestAttributes instanceof ServletRequestAttributes) {
             HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
@@ -56,7 +55,7 @@ public class ControllerLogAspect {
             String beforeMessage = commonStr + getRequestArgs(joinPoint);
             log.info("{} CALLING {}\n{}", CALLING_ARROW, getNow(), beforeMessage);
 
-            result = (ResponseEntity<?>) joinPoint.proceed();
+            result = (APIResponse) joinPoint.proceed();
 
             /** 비즈니스 로직 연결 이후 성공 케이스에 대한 log 남기기
              * 로그 규격
@@ -160,33 +159,30 @@ public class ControllerLogAspect {
         return sb.toString();
     }
 
-    private String getResponseMessage(ResponseEntity<?> result) {
+    private String getResponseMessage(APIResponse result) {
         StringBuilder sb = new StringBuilder();
 
-        HttpStatusCode statusCode = result.getStatusCode();
+        // status code
+        Integer statusCode = result.getHeader().getResultCode();
         sb.append(SPACE).append("[result]").append("\n");
-        sb.append(SPACE).append("\t- return code : ").append(statusCode.value()).append("\n");
+        sb.append(SPACE).append("\t- return code : ").append(statusCode).append("\n");
 
+        // body
         Object body = Objects.requireNonNull(result.getBody());
-
-        if(body instanceof String) {
-            sb.append(SPACE).append("\t- return val : ").append(body);
-        } else {
-            String name = body.getClass().getName();
-            sb.append(SPACE).append("\t- return val : ").append(name);
-        }
+        String name = body.getClass().getName();
+        sb.append(SPACE).append("\t- return val : ").append(name);
 
         return sb.toString();
     }
 
-    private String getExceptionMessage(ResponseEntity<?> result, Exception e) {
+    private String getExceptionMessage(APIResponse result, Exception e) {
         StringBuilder sb = new StringBuilder();
 
         // status code
         if(result != null) {
-            HttpStatusCode statusCode = result.getStatusCode();
+            Integer statusCode = result.getHeader().getResultCode();
             sb.append(SPACE).append("[result]").append("\n");
-            sb.append(SPACE).append("\t- return code : ").append(statusCode.value()).append("\n");
+            sb.append(SPACE).append("\t- return code : ").append(statusCode).append("\n");
         }
 
         // error message

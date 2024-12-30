@@ -9,7 +9,8 @@ import lombok.*;
 public class EntityHeader {
 
     private String responseTime;
-    private String pathUrl;
+    private String actionUrl;
+    private String actionMethod;
     private Integer resultCode;
     private String resultMessage;
     private String detailMessage;
@@ -22,10 +23,11 @@ public class EntityHeader {
 
     public void setResultMessage(String typeName) {
         ServiceMessageType type = ServiceMessageType.valueOfString( typeName );
+
         if(type != null) {
             this.resultCode = type.getCode();
             this.resultMessage = type.name();
-            this.detailMessage = typeName;
+            this.detailMessage = type.getServiceMessage();
         }
         // null 이라면 위의 변수들 모두 null값을 담아 return
     }
