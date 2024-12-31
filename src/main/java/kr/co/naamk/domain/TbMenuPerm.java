@@ -13,13 +13,19 @@ public class TbMenuPerm {
     @Id
     @ManyToOne
     @JoinColumn(name = "menu_id")
-    @Comment("메뉴 고유 ID")
+    @Comment("메뉴 ID")
     private TbMenus menu;
 
 
     @Id
     @ManyToOne
     @JoinColumn(name="perm_id")
-    @Comment("권한 고유 ID")
+    @Comment("권한 ID")
     private TbPerms perm;
+
+    @Id
+    @ManyToOne
+    @JoinColumn(name="role_id")
+    @Comment("역할 ID")
+    private TbRoles role;
 }

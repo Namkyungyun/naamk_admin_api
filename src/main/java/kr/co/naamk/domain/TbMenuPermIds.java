@@ -9,6 +9,7 @@ import java.util.Objects;
 public class TbMenuPermIds implements Serializable {
     private Long menu;
     private Long perm;
+    private Long role;
 
     @Override
     public boolean equals(Object o) {
@@ -16,11 +17,12 @@ public class TbMenuPermIds implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         TbMenuPermIds that = (TbMenuPermIds) o;
         return Objects.equals(menu, that.getMenu()) &&
-                Objects.equals(perm, that.getPerm());
+                Objects.equals(perm, that.getPerm()) &&
+                Objects.equals(role, that.getRole());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(menu, perm);
+        return Objects.hash(menu, perm, role);
     }
 }

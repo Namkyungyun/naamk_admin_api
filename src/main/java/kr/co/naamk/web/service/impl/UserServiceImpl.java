@@ -1,4 +1,4 @@
-package kr.co.naamk.web.service;
+package kr.co.naamk.web.service.impl;
 
 import kr.co.naamk.exception.ServiceException;
 import kr.co.naamk.exception.type.ServiceMessageType;
@@ -8,6 +8,7 @@ import kr.co.naamk.web.repository.jpa.RoleRepository;
 import kr.co.naamk.web.repository.jpa.UserRepository;
 import kr.co.naamk.web.repository.queryDSL.UserQueryRepository;
 import kr.co.naamk.domain.*;
+import kr.co.naamk.web.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

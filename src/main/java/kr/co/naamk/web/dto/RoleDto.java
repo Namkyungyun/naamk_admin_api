@@ -13,7 +13,6 @@ public class RoleDto {
     public static class RoleRequest {
         private String roleNm;
         private String roleCd;
-        private List<Long> permIds;
     }
 
     @Data @Builder
@@ -21,6 +20,5 @@ public class RoleDto {
         private Long id;
         private String roleNm;
         private String roleCd;
-        private List<PermDto.PermResponse> perms = new ArrayList<>();
     }
 }

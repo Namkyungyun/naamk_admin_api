@@ -25,18 +25,6 @@ public class RoleService {
     @Transactional
     public void createRole(RoleDto.RoleRequest roleDto) {
         TbRoles role = RoleMapper.INSTANCE.roleRequestDtoToEntity(roleDto);
-        role.setRolePerms(new ArrayList<>());
-
-        for(Long permId : roleDto.getPermIds()) {
-            TbPerms perm = permRepository.findById(permId).orElseThrow(()-> new NullPointerException("no perm"));
-
-            TbRolePerm rolePerm = TbRolePerm.builder()
-                    .perm(perm)
-                    .role(role)
-                    .build();
-
-            role.getRolePerms().add(rolePerm);
-        }
 
         roleRepository.save(role);
 
@@ -54,20 +42,8 @@ public class RoleService {
             list = roleRepository.findById(roleId).stream().toList();
         }
 
-        List<RoleDto.RoleResponse> result = new ArrayList<>();
-        for(TbRoles role : list) {
-            final RoleDto.RoleResponse response = RoleMapper.INSTANCE.entityToRoleResponse(role);
 
-            List<PermDto.PermResponse> perms = Objects.requireNonNull(role).getRolePerms().stream().map(rolePerm -> {
-                TbPerms entity = rolePerm.getPerm();
-                return PermMapper.INSTANCE.entityToResponseDto(entity);
-            }).toList();
-
-            response.setPerms(perms);
-            result.add(response);
-        }
-
-        return result;
+        return RoleMapper.INSTANCE.entitiesToRoleResponseDtos(list);
     }
 
 }
