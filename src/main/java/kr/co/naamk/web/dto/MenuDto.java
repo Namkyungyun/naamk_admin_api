@@ -3,8 +3,8 @@ package kr.co.naamk.web.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +12,23 @@ import java.util.List;
 @AllArgsConstructor
 public class MenuDto {
 
+    @Data @Builder
+    public static class MenuPermissionSearch {
+        private Long roleId;
+        private Long parentId;
+        private boolean isDisplay;
+    }
+
     @Data
-    @NoArgsConstructor
-    public static class MenuRequest {
+    public static class MenuPermissionRequest {
+        private Long menuId;
+        private Long roleId;
+        private List<Long> permIds = new ArrayList<>();
+    }
+
+
+    @Data
+    public static class CreateOrUpdateRequest {
         private String menuCd;
         private String menuNm;
         private String menuDesc;
@@ -22,30 +36,47 @@ public class MenuDto {
         private Long parentId;
         private String pathUrl;
         private boolean activated = true;
-        private List<Long> permIds = new ArrayList<>();
     }
 
     @Data
-    @NoArgsConstructor
-    public static class MenuTreeDetailResponse {
+    public static class ManagementTreeResponse { // 메뉴 관리의 리스트로 사용.
         private Long id;
-        private String menuCd;
+        private Long parentId;
         private String menuNm;
+        private boolean activated;
+        private List<ManagementTreeResponse> children = new ArrayList<>();
+    }
+
+    @Data
+    public static class DisplayTreeResponse { // 로그인 이후 메뉴탭에 사용
+        private Long id;
+        private String menuNm;
+        private String pathUrl;
+        private List<String> permCds = new ArrayList<>();
+        private List<DisplayTreeResponse> children = new ArrayList<>();
+    }
+
+    @Data
+    public static class PermissionTreeResponse { // 역할별 메뉴 권한 관리에서 사용
+        private Long id;
+        private String menuNm;
+        private String menuCd;
+        private boolean activated;
+        private List<PermDto.PermStatusByRole> perms = new ArrayList<>();
+        private List<PermissionTreeResponse> children = new ArrayList<>();
+    }
+
+    @Data
+    public static class MenuDetailResponse {
+        private Long id;
+        private String menuNm;
+        private String menuCd;
         private String menuDesc;
         private Integer orderNum;
+        private Long parentId;
         private String pathUrl;
         private boolean activated;
-        private List<PermDto.PermResponse> perms = new ArrayList<>();
-        private List<MenuTreeDetailResponse> children = new ArrayList<>();
-    }
-
-    @Data
-    @NoArgsConstructor
-    public static class MenuTreeResponse {
-        private Long id;
-        private String menuCd;
-        private String menuNm;
-        private String pathUrl;
-        private List<MenuTreeResponse> children = new ArrayList<>();
+        private Timestamp createdAt;
+        private Timestamp updatedAt;
     }
 }

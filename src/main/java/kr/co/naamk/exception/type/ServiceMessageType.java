@@ -29,6 +29,8 @@ public enum ServiceMessageType {
     PERMISSION_NOT_FOUND(3003, "The requested permission was not found."),
     MENU_NOT_FOUND(3004, "The requested menu was not found."),
 
+    // constraints data
+    HAVE_CHILDREN_DATA(5001, "There is dependent children data.")
     ;
 
 

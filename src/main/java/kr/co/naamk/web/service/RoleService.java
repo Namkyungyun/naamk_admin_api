@@ -1,8 +1,6 @@
 package kr.co.naamk.web.service;
 
-import kr.co.naamk.web.dto.PermDto;
 import kr.co.naamk.web.dto.RoleDto;
-import kr.co.naamk.web.dto.mapstruct.PermMapper;
 import kr.co.naamk.web.dto.mapstruct.RoleMapper;
 import kr.co.naamk.web.repository.jpa.PermRepository;
 import kr.co.naamk.web.repository.jpa.RoleRepository;
@@ -11,9 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +39,7 @@ public class RoleService {
         }
 
 
-        return RoleMapper.INSTANCE.entitiesToRoleResponseDtos(list);
+        return RoleMapper.INSTANCE.entitiesToRoleResponseDTOs(list);
     }
 
 }

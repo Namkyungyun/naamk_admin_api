@@ -62,7 +62,7 @@ public class UserQueryRepository {
 
 
         return PageableExecutionUtils.getPage(
-                UserMapper.INSTANCE.entitiesToListResponseDtos(content),
+                UserMapper.INSTANCE.entitiesToListResponseDTOs(content),
                 pageable,
                 () -> total
         );

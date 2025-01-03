@@ -17,16 +17,15 @@ public interface UserMapper {
 
     TbUsers createRequestDtoToEntity(UserDto.CreateRequest dto);
 
-    @Mapping(target = "roles", expression = "java(getRoleResponseDtos(entity.getUserRoles()))")
-    UserDto.ListResponse entityToListResponseDto(TbUsers entity);
+    @Mapping(target = "roles", expression = "java(getRoleResponseDTOs(entity.getUserRoles()))")
+    UserDto.ListResponse entityToListResponseDTO(TbUsers entity);
+    List<UserDto.ListResponse> entitiesToListResponseDTOs(List<TbUsers> entities);
 
-    List<UserDto.ListResponse> entitiesToListResponseDtos(List<TbUsers> entities);
-
-    @Mapping(target = "roles", expression = "java(getRoleResponseDtos(entity.getUserRoles()))")
-    UserDto.DetailResponse entityToDetailResponseDto(TbUsers entity);
+    @Mapping(target = "roles", expression = "java(getRoleResponseDTOs(entity.getUserRoles()))")
+    UserDto.DetailResponse entityToDetailResponseDTO(TbUsers entity);
 
 
-    default List<RoleDto.RoleResponse> getRoleResponseDtos(List<TbUserRole> userRoles) {
+    default List<RoleDto.RoleResponse> getRoleResponseDTOs(List<TbUserRole> userRoles) {
         return userRoles.stream()
                 .map(userRole -> RoleMapper.INSTANCE.entityToRoleResponse(userRole.getRole()))
                 .toList();

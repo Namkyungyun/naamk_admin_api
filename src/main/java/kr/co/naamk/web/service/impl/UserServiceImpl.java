@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
         TbUsers user = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ServiceMessageType.USER_NOT_FOUND));
 
-        return UserMapper.INSTANCE.entityToDetailResponseDto(user);
+        return UserMapper.INSTANCE.entityToDetailResponseDTO(user);
     }
 
 
@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
 
     /* delete private function */
     private void deleteUserRoleInUser(TbUsers user) {
-        List<TbUserRole> userRoles = new ArrayList<>(user.getUserRoles()); // ConcurrentModificationException 방지
+        List<TbUserRole> userRoles = user.getUserRoles(); // ConcurrentModificationException 방지
 
         for(TbUserRole userRole : userRoles) {
             user.removeUserRole(userRole); // 연관 관계에서 제거 && orphanRemoval = true를 통해 자식 엔티티 자동 삭제를 활용.

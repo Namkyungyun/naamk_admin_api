@@ -11,13 +11,21 @@ public class PermDto {
     private String permNm;
 
 
-    @Data @Builder
-    @AllArgsConstructor @NoArgsConstructor
+    @Data
     public static class PermResponse {
         private Long id;
         private String permCd;
         private String permNm;
     }
+
+    @Data
+    public static class PermStatusByRole {
+        private Long id;
+        private String permCd;
+        private String permNm;
+        private boolean activated = true;
+    }
+
 
 
 }
