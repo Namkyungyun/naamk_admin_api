@@ -1,46 +1,73 @@
 package kr.co.naamk.web.service.impl;
 
-
 import kr.co.naamk.domain.*;
 import kr.co.naamk.exception.ServiceException;
 import kr.co.naamk.exception.type.ServiceMessageType;
-import kr.co.naamk.web.dto.MenuDto;
+import kr.co.naamk.web.dto.PermDto;
 import kr.co.naamk.web.dto.mapstruct.MenuMapper;
+import kr.co.naamk.web.dto.type.PermActionType;
 import kr.co.naamk.web.repository.jpa.*;
 import kr.co.naamk.web.repository.queryDSL.MenuQueryRepository;
 import kr.co.naamk.web.service.MenuService;
+import kr.co.naamk.web.service.RoleMenuPermService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.List;
+
+import static kr.co.naamk.web.dto.MenuDto.*;
+
 
 @Service
 @RequiredArgsConstructor
 public class MenuServiceImpl implements MenuService {
 
-    private final MenuRepository menuRepository;
     private final UserRepository userRepository;
+    private final MenuRepository menuRepository;
+    private final PermRepository permRepository;
     private final MenuQueryRepository menuQueryRepository;
 
-    /** 메뉴 생성*/
+    private final RoleMenuPermService roleMenuPermService;
+
+
+    /** 메뉴 관리 > 생성
+     *  메뉴 생성 및 superadmin에게 자동으로 모든 권한 활성화로 생성.
+     * */
     @Override
     @Transactional
-    public void saveMenu(MenuDto.CreateOrUpdateRequest dto) {
-        TbMenus menu = MenuMapper.INSTANCE.requestDtoToEntity(dto);
-        menuRepository.save(menu);
+    public void createMenu(CreateRequest dto) {
+        // 메뉴 조회
+        Optional<TbMenus> menu = menuRepository.findByMenuCdIgnoreCase(dto.getMenuCd());
+
+        if(menu.isPresent()) throw new ServiceException(ServiceMessageType.MENU_ALREADY_EXIST);
+
+        // 메뉴 저장
+        TbMenus savedMenu = menuRepository.save(MenuMapper.INSTANCE.requestDtoToEntity(dto));
+
+        // 새 메뉴를 역할별로 권한 생성
+        roleMenuPermService.createRoleMenuPermsByMenu(savedMenu);
+
     }
 
 
+    /** 메뉴 관리 > 삭제
+     * 메뉴 삭제 및 role-menu-perm 연관 데이터 삭제
+     * */
     @Override
     public void deleteMenu(Long id) {
         // 데이터 존재여부 조회
-        TbMenus menu = menuRepository.findById(id).orElseThrow(() -> new ServiceException(ServiceMessageType.MENU_NOT_FOUND));
+        TbMenus menu = menuRepository.findById(id)
+                .orElseThrow(() -> new ServiceException(ServiceMessageType.MENU_NOT_FOUND));
 
         // 종속된 데이터 존재 확인
         List<TbMenus> childMenu = menuRepository.findByParentId(menu.getId());
         if(!childMenu.isEmpty()) {
-            List<String> childMenuCds = childMenu.stream().map(TbMenus::getMenuCd).toList();
+            List<String> childMenuCds = childMenu.stream()
+                    .map(TbMenus::getMenuCd)
+                    .toList();
+
             throw new ServiceException(ServiceMessageType.HAVE_CHILDREN_DATA, "children menus = " + childMenuCds );
         }
 
@@ -48,106 +75,145 @@ public class MenuServiceImpl implements MenuService {
         menuRepository.delete(menu);
     }
 
-    /** 로그인 유저 이후 메뉴탭 불러오기
-     * : userId -> roleId -> 해당 role에 조회 권한이 없을 시,
-     *   메뉴트리 내에서 해당 메뉴 확인불가 (생성, 삭제, 수정 권한이 있어도)
+
+
+    /**  메뉴 관리 상세
+     * 존재하는 메뉴 인지 확인
      * */
     @Override
     @Transactional(readOnly = true)
-    public List<MenuDto.DisplayTreeResponse> getDisplayTreeByUserId(Long userId) {
-        // 유저 확인
-        TbUsers tbUsers = userRepository.findById(userId)
-                .orElseThrow(() -> new ServiceException(ServiceMessageType.USER_NOT_FOUND));
-
-        // TODO !!!! role을 list로 받아서 처리할 수 있도록 수정 필요
-        Long roleId = tbUsers.getUserRoles().getFirst().getRole().getId();
-
-        // MenuDto.MenuPermissionSearch 생성
-        MenuDto.MenuPermissionSearch search = MenuDto.MenuPermissionSearch.builder()
-                .roleId(roleId)
-                .isDisplay(true)
-                .build();
-
-        // 1. parent 메뉴 조회
-        List<TbMenus> menuWithPerms = menuQueryRepository.findMenuWithPermsBySearch(search);
-        // 2. parent DTOs 변환
-        List<MenuDto.DisplayTreeResponse> menuWithPermsDTOs
-                = MenuMapper.INSTANCE.entitiesToDisplayTreeDTOs(menuWithPerms);
-        // 3. 자식 메뉴 재귀
-        menuWithPermsDTOs.forEach(rootMenu -> setChildrenMenuTree(rootMenu, rootMenu.getId(), search));
-
-        return menuWithPermsDTOs;
-    }
-
-    /** 재귀 -> '메뉴탭 트리' 사용**/
-    private void setChildrenMenuTree(Object parentDTO, Long parentId,
-                                     MenuDto.MenuPermissionSearch parentSearch) {
-        // findMenuWithPermsBySearch 인자를 위한  상위 메뉴 id값 넣기
-        parentSearch.setParentId(parentId);
-
-        // parentId = search.getParentId() 데이터 조회
-        List<TbMenus> children = menuQueryRepository.findMenuWithPermsBySearch(parentSearch);
-
-        // dto 변환
-        List<MenuDto.DisplayTreeResponse> childrenDTOs =  MenuMapper.INSTANCE.entitiesToDisplayTreeDTOs(children);
-
-        // 재귀 (차일드 데이터가 없다면 재귀가 동작 x)
-        childrenDTOs.forEach(dto -> setChildrenMenuTree(dto, dto.getId(), parentSearch));
-
-        // 부모 DTO에 childrenDTOS 넣기
-        ((MenuDto.DisplayTreeResponse) parentDTO).setChildren(childrenDTOs);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<MenuDto.ManagementTreeResponse> getManagementTreeBySearch(String menuCd, String menuNm) {
-
-        // if menuNm, menuCd are null 인 경우 -> parentId is null인 root menu 전체 데이터 반환
-        if((menuNm == null || menuNm.isBlank()) && (menuCd == null || menuCd.isBlank())) {
-            List<TbMenus> rootMenus = menuRepository.findByParentIdIsNull();
-            return MenuMapper.INSTANCE.entitiesToManagementTreeDTOs(rootMenus);
-        }
-
-        // if menuNm, menuCd are not null 인 경우 -> parentId로 역재귀로 데이터 조회.
-        if(menuCd == null) menuCd = "";
-        if(menuNm == null) menuNm = "";
-
-        // 대소문자 구분없이 검색될 수 있도록 (Containing 적용 시, 중복 데이터 발생함)
-        List<TbMenus> menus = menuRepository.findByMenuCdIgnoreCaseOrMenuNmIgnoreCase(menuCd, menuNm);
-        // DTO 변환
-        List<MenuDto.ManagementTreeResponse> dtos = MenuMapper.INSTANCE.entitiesToManagementTreeDTOs(menus);
-
-        List<MenuDto.ManagementTreeResponse> result = new ArrayList<>();
-        for(MenuDto.ManagementTreeResponse dto : dtos) {
-            final Long parentId = dto.getParentId();
-            // parentId가 null 인 경우 그대로 dto 민, 외 경우 역재귀(부모 찾기)
-            result.add(parentId == null ? dto : setParentMenuTree(dto));
-        }
-
-        return result;
-    }
-
-    /** 역재귀(부모 찾기) */
-    private MenuDto.ManagementTreeResponse setParentMenuTree(MenuDto.ManagementTreeResponse childMenu) {
-        TbMenus parent = menuRepository.findById(childMenu.getParentId())
-                .orElseThrow(() -> new ServiceException(ServiceMessageType.MENU_NOT_FOUND));
-
-        MenuDto.ManagementTreeResponse parentDto = MenuMapper.INSTANCE.entityToManagementTreeDTO(parent);
-        parentDto.getChildren().add(childMenu);
-
-        if(parent.getParentId() != null) {
-            return setParentMenuTree(parentDto);
-        } else {
-            return parentDto;
-        }
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public MenuDto.MenuDetailResponse getMenuDetailById(Long id) {
+    public MenuDetailResponse getMenuDetailById(Long id) {
         TbMenus menu = menuRepository.findById(id)
                 .orElseThrow(() -> new ServiceException(ServiceMessageType.MENU_NOT_FOUND));
 
         return MenuMapper.INSTANCE.entityToDetailDTO(menu);
+    }
+
+
+
+    /**  메뉴 관리 > 조회 (검색 포함)
+     * (1) search 생성 <- menuCd, menuNm,
+     * (2) 전체 메뉴트리 recursive data 조회
+     * (3) child menu 가져오기 <- search / search.isRootMenu = false,
+     * (4) (3)번의 결과를 (2)번 메뉴트리에서 instance 추출
+     * (5) (4)번의 메뉴트리에서 instancee들의 path를 통해 트리구조상 연관된 id 추출
+     * (6) child menu 새로 가져오기 <- search.menuIds = (5)번
+     * (7) (4)번의 트리 구조상의 root에 해당하는 id 추출
+     * (8) root menu 가져오기 <- search.menuIds = (7)번, search.isRootMenu = true
+     * (9) menu tree object 생성 -> return object
+     * */
+    @Override
+    @Transactional(readOnly = true)
+    public List<MenuTreeResponse> getManagementTreeBySearch(String menuCd, String menuNm) {
+
+        // search 생성
+        Search search = new Search();
+        search.setMenuCd(menuCd);
+        search.setMenuNm(menuNm);
+
+        // 메느 튜리 조회
+        List<Map<String, Object>> menuTreeMap = menuRepository.nativeFindMenuTreeExceptionRoot();
+        List<MenuTree> menuTreeList = MenuMapper.INSTANCE.objsToMenuTreeDTOS(menuTreeMap);
+
+        // 검색 조건을 가진 자식 메뉴 조회
+        search.setRootMenu(false);
+        List<TbMenus> childMenus  = menuQueryRepository.findMenusBySearch(search);
+
+        // 검색 결과로 나온 자식 메뉴를 메뉴 트리에서 추출
+        List<MenuTree> menusInMenuTree = extractMenuInMenuTree(childMenus, menuTreeList);
+
+        // associated id 필터
+        List<Long> associatedIds = extractAssociatedIds(menusInMenuTree);
+
+        // 위의 자식 조건을 가지고 연관된 모든 자식 메뉴들 가지고 오도로 재 조회
+        search.setMenuIds(associatedIds);
+        childMenus  = menuQueryRepository.findMenusBySearch(search);
+
+        // 루트 메뉴 조회
+        // 연관된 root id 필터
+        List<Long> rootIds = extractRootIds(menusInMenuTree);
+
+        search.setRootMenu(true);
+        search.setMenuIds(rootIds);
+        List<TbMenus> rootMenus = menuQueryRepository.findMenusBySearch(search);
+
+        // 메뉴 트리 만들기
+        return MenuMapper.INSTANCE.generateMenuTree(rootMenus, childMenus, menuTreeList, PermDto.PermResponse.class);
+    }
+
+    // 검색 결과 조회된 메뉴를 메뉴트리 instance로 추출
+    private List<MenuTree> extractMenuInMenuTree(List<TbMenus> searchedMenus, List<MenuTree> menuTree) {
+        List<Long> ids = searchedMenus.stream().map(TbMenus::getId).toList();
+
+        return menuTree.stream()
+                .filter(menu -> ids.contains(menu.getId()))
+                .toList();
+    }
+
+    // 메뉴 트리에 연관된 id 추출
+    private List<Long> extractAssociatedIds(List<MenuTree> menuTree) {
+        return menuTree.stream()
+                .flatMap(menu -> Arrays.stream(menu.getPath().split(",")))
+                .map(Long::parseLong)
+                .distinct()
+                .toList();
+    }
+
+    // 메뉴 트리에 연관된 root id 추출
+    private List<Long> extractRootIds(List<MenuTree> menuTree) {
+        return menuTree.stream()
+                .map(MenuTree::getRootId)
+                .distinct()
+                .toList();
+    }
+
+
+
+    /**  메뉴탭 > 조회
+     * (1) userId -> List<Long> roleIds
+     * (2) roleIds -> perm id for read permission
+     * (3) search 생성 <- roleIds, permIds, isDisplay
+     * (4) 전체 메뉴트리 recursive data 조회
+     * (5) child menu 가져오기 <- search / search.isRootMenu = false
+     * (6) root menu 가져오기 <- search / search.isRootMenu = true
+     * (7) menuTree object 생성 -> return object
+     * */
+    @Override
+    @Transactional(readOnly = true)
+    public List<MenuTreeResponse> getDisplayTreeByUserId(Long userId) {
+        // 유저 조회
+        TbUsers user = userRepository.findById(userId)
+                .orElseThrow(() -> new ServiceException(ServiceMessageType.USER_NOT_FOUND));
+
+        // 해당 유저의 모든 role 조회
+        List<Long> roleIds = user.getUserRoles().stream()
+                .map(role -> role.getRole().getId())
+                .toList();
+
+        // 조회 권한 id 조회
+        Long permId = permRepository.findByPermCd(PermActionType.READ.getCode())
+                .orElseThrow(()-> new ServiceException(ServiceMessageType.PERMISSION_NOT_FOUND))
+                .getId();
+
+        // search 생성
+        Search search = new Search();
+        search.setRoleIds(roleIds);
+        search.setPermIds(List.of(permId));
+        search.setDisplay(true);
+
+        // 전체 메뉴 트리 재귀 쿼리 조회
+        List<Map<String, Object>> menuTreeMap = menuRepository.nativeFindMenuTreeExceptionRoot();
+        List<MenuTree> menuTreeList = MenuMapper.INSTANCE.objsToMenuTreeDTOS(menuTreeMap);
+
+        // 하위 메뉴 조회
+        search.setRootMenu(false);
+        List<TbMenus> childMenus = menuQueryRepository.findMenusBySearch(search);
+
+        // 전체 root메뉴 조회
+        search.setRootMenu(true);
+        List<TbMenus> rootMenus = menuQueryRepository.findMenusBySearch(search);
+
+        // 메뉴 트리 만들기
+        return MenuMapper.INSTANCE.generateMenuTree(rootMenus, childMenus, menuTreeList, PermDto.PermResponse.class);
     }
 }

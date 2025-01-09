@@ -1,7 +1,6 @@
 package kr.co.naamk.web.repository.queryDSL;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.naamk.domain.*;
 import kr.co.naamk.web.dto.MenuDto;
@@ -16,34 +15,50 @@ public class MenuQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<TbMenus> findMenuWithPermsBySearch(MenuDto.MenuPermissionSearch search) {
-        QTbRoles role = QTbRoles.tbRoles;
+    /** findParent ? rootMenus : childMenus */
+    public List<TbMenus> findMenusBySearch(MenuDto.Search search) {
         QTbMenus menus = QTbMenus.tbMenus;
-        QTbPerms perms = QTbPerms.tbPerms;
-        QTbMenuPerm  menuPerm = QTbMenuPerm.tbMenuPerm;
-
-
-        // query
-        JPAQuery<TbMenus> jpaQuery = queryFactory.selectFrom(menus)
-                .leftJoin(menus.permRoles, menuPerm).on(menuPerm.role.id.eq(search.getRoleId()))
-                .leftJoin(menuPerm.perm, perms)
-                .leftJoin(menuPerm.role, role);
+        QTbRoleMenuPerm roleMenuPerm = QTbRoleMenuPerm.tbRoleMenuPerm;
 
         // 검색 조건
-        BooleanBuilder predicate = new BooleanBuilder(
-                search.getParentId() != null ?
-                        menus.parentId.eq(search.getParentId()) : menus.parentId.isNull()
-        );
+        BooleanBuilder predicate = new BooleanBuilder();
 
-        if(search.isDisplay()) {
-            predicate.and(perms.permCd.eq("R"));
+        if(search.isRootMenu()) {
+            predicate.and(menus.parentId.isNull());
+        } else {
+            predicate.and(menus.parentId.isNotNull());
         }
 
+        if(!search.getRoleIds().isEmpty()) {
+            predicate.and(roleMenuPerm.role.id.in(search.getRoleIds()));
+            predicate.and(roleMenuPerm.activated.eq(true));
+        }
 
-        return jpaQuery
+        if(!search.getPermIds().isEmpty()) {
+            predicate.and(roleMenuPerm.perm.id.in(search.getPermIds()));
+        }
+
+        if(search.isDisplay()) {
+            predicate.and(menus.activated.eq(true));
+        }
+
+        if(search.getMenuCd() != null) {
+            predicate.and(menus.menuCd.startsWith(search.getMenuCd()));
+        }
+
+        if(search.getMenuNm() != null) {
+            predicate.and(menus.menuNm.startsWith(search.getMenuNm()));
+        }
+
+        if(!search.getMenuIds().isEmpty()) {
+            predicate.or(menus.id.in(search.getMenuIds()));
+        }
+
+        return queryFactory.selectFrom(menus)
+                .join(menus.roleMenuPerms, roleMenuPerm)
                 .where(predicate)
+                .orderBy(menus.orderNum.asc())
                 .distinct()
                 .fetch();
     }
-
 }

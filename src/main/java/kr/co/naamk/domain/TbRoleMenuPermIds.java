@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Getter @Setter
-public class TbMenuPermIds implements Serializable {
+public class TbRoleMenuPermIds implements Serializable {
     private Long menu;
     private Long perm;
     private Long role;
@@ -15,7 +15,7 @@ public class TbMenuPermIds implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TbMenuPermIds that = (TbMenuPermIds) o;
+        TbRoleMenuPermIds that = (TbRoleMenuPermIds) o;
         return Objects.equals(menu, that.getMenu()) &&
                 Objects.equals(perm, that.getPerm()) &&
                 Objects.equals(role, that.getRole());

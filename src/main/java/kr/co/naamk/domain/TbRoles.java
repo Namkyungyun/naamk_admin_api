@@ -28,6 +28,6 @@ public class TbRoles extends AuditEntity {
     private List<TbUserRole> userRoles = new ArrayList<>();
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<TbMenuPerm> menuPerms = new ArrayList<>();
+    private List<TbRoleMenuPerm> menuPerms = new ArrayList<>();
 
 }

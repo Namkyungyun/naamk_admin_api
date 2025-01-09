@@ -17,15 +17,4 @@ public class PermDto {
         private String permCd;
         private String permNm;
     }
-
-    @Data
-    public static class PermStatusByRole {
-        private Long id;
-        private String permCd;
-        private String permNm;
-        private boolean activated = true;
-    }
-
-
-
 }

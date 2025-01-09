@@ -12,23 +12,21 @@ import java.util.List;
 @AllArgsConstructor
 public class MenuDto {
 
-    @Data @Builder
-    public static class MenuPermissionSearch {
-        private Long roleId;
-        private Long parentId;
+    @Data
+    public static class Search {
         private boolean isDisplay;
-    }
+        private boolean isRootMenu;
 
-    @Data
-    public static class MenuPermissionRequest {
-        private Long menuId;
-        private Long roleId;
         private List<Long> permIds = new ArrayList<>();
+        private List<Long> roleIds = new ArrayList<>();
+        private List<Long> menuIds = new ArrayList<>();
+
+        private String menuCd;
+        private String menuNm;
     }
 
-
     @Data
-    public static class CreateOrUpdateRequest {
+    public static class CreateRequest {
         private String menuCd;
         private String menuNm;
         private String menuDesc;
@@ -39,31 +37,24 @@ public class MenuDto {
     }
 
     @Data
-    public static class ManagementTreeResponse { // 메뉴 관리의 리스트로 사용.
-        private Long id;
+    public static class MenuTree {
+        private Long rootId;
         private Long parentId;
-        private String menuNm;
-        private boolean activated;
-        private List<ManagementTreeResponse> children = new ArrayList<>();
+        private Long id;
+        private Integer level;
+        private Integer orderNum;
+        private String path;
     }
 
     @Data
-    public static class DisplayTreeResponse { // 로그인 이후 메뉴탭에 사용
+    public static class MenuTreeResponse {
         private Long id;
+        private String menuCd;
         private String menuNm;
         private String pathUrl;
-        private List<String> permCds = new ArrayList<>();
-        private List<DisplayTreeResponse> children = new ArrayList<>();
-    }
-
-    @Data
-    public static class PermissionTreeResponse { // 역할별 메뉴 권한 관리에서 사용
-        private Long id;
-        private String menuNm;
-        private String menuCd;
         private boolean activated;
-        private List<PermDto.PermStatusByRole> perms = new ArrayList<>();
-        private List<PermissionTreeResponse> children = new ArrayList<>();
+        private List<Object> perms = new ArrayList<>();
+        private List<MenuTreeResponse> children = new ArrayList<>();
     }
 
     @Data

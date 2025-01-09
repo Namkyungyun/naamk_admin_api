@@ -48,7 +48,7 @@ public class TbMenus extends AuditEntity {
     private boolean activated;
 
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, fetch= FetchType.LAZY, orphanRemoval = true)
-    private List<TbMenuPerm> permRoles = new ArrayList<>();
+    private List<TbRoleMenuPerm> roleMenuPerms = new ArrayList<>();
 
     @Transient // JPA가 관리하지 않는 필드
     private List<TbMenus> children;
