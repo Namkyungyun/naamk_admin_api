@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface MenuRepository extends JpaRepository<TbMenus, Long> {
+   /** menu delete에서 사용 */
    List<TbMenus> findByParentId(Long parentId);
 
    /** menu create에서 사용 */
