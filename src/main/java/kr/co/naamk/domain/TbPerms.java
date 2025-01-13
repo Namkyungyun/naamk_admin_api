@@ -20,4 +20,7 @@ public class TbPerms extends AuditEntity {
 
     @Column(name = "perm_cd", unique = true, nullable = false, length = 10)
     private String permCd;
+
+    @Column(name="perm_desc")
+    private String permDesc;
 }

@@ -1,45 +1,30 @@
 package kr.co.naamk.web.service;
 
-import kr.co.naamk.web.dto.PermDto;
-import kr.co.naamk.web.dto.mapstruct.PermMapper;
-import kr.co.naamk.web.repository.jpa.PermRepository;
 import kr.co.naamk.domain.TbPerms;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import kr.co.naamk.web.dto.PermDto;
 
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class PermService {
+public interface PermService {
+    // entity 반환
+    List<TbPerms> getPermissions();
 
-    private final PermRepository permRepository;
+    // entity 반환
+    TbPerms getPermissionById(Long id);
 
-    @Transactional
-    public void createPermission(PermDto dto) {
-        TbPerms perm = TbPerms.builder()
-                .permNm(dto.getPermNm())
-                .permCd(dto.getPermCd())
-                .build();
+    void createPermission(PermDto.PermCreateRequest dto);
 
-        permRepository.save(perm);
-    }
+    // 삭제 -> 연관된 데이터를 삭제안한 경우 serviceException으로 처리
+    void deletePermissionById(Long permId);
 
-    @Transactional(readOnly = true)
-    public List<PermDto.PermResponse> getPermissions(Long permId) {
-        List<PermDto.PermResponse> result;
-        List<TbPerms> list;
+    // 수정
+    void updatePermission(Long id, PermDto.PermUpdateRequest dto);
 
-        if(permId == null) {
-            list = permRepository.findAll().stream().toList();
-        } else {
-            list = permRepository.findById(permId).stream().toList();
-        }
+    // dto로 매핑된 값들로 모두 조회
+    List<PermDto.PermListResponse> getAll();
 
-        result = list.stream().map(PermMapper.INSTANCE::entityToResponseDto).toList();
+    // 상세가져오기
+    PermDto.PermDetailResponse getDetailById(Long permId);
 
-        return result;
-    }
 
 }

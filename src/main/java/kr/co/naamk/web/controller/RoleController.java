@@ -18,8 +18,8 @@ public class RoleController {
     private final RoleService roleService;
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public Object saveRole(@RequestBody RoleDto.RoleCreateRequest roleDto,
-                           HttpServletRequest request) {
+    public Object createRole(@RequestBody RoleDto.RoleCreateRequest roleDto,
+                             HttpServletRequest request) {
         roleService.createRole(roleDto);
 
         return APIResponseEntityBuilder.create().service(request)
@@ -50,22 +50,22 @@ public class RoleController {
 
     @RequestMapping(value="", method = RequestMethod.GET)
     public Object getAll(HttpServletRequest request) {
-        List<RoleDto.RoleListResponse> roles = roleService.getAll();
+        List<RoleDto.RoleListResponse> result = roleService.getAll();
 
         return APIResponseEntityBuilder.create().service(request)
                 .resultMessage(ServiceMessageType.SUCCESS)
-                .entity(roles)
+                .entity(result)
                 .build();
     }
 
     @RequestMapping(value="/{roleId}", method = RequestMethod.GET)
     public Object getDetail(@PathVariable("roleId") Long roleId,
                             HttpServletRequest request) {
-        RoleDto.RoleDetailResponse role = roleService.getDetailById(roleId);
+        RoleDto.RoleDetailResponse result = roleService.getDetailById(roleId);
 
         return APIResponseEntityBuilder.create().service(request)
                 .resultMessage(ServiceMessageType.SUCCESS)
-                .entity(role)
+                .entity(result)
                 .build();
     }
 }

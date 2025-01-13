@@ -85,7 +85,7 @@ public interface MenuMapper {
             Long key = entity.getId();
             MenuDto.MenuTreeResponse value = entityToMenuTreeResponseDTO(entity);
 
-            List<PermDto.PermResponse> perms = getPerms(entity.getRoleMenuPerms());
+            List<PermDto.PermListResponse> perms = getPerms(entity.getRoleMenuPerms());
             value.getPerms().addAll(perms);
 
             map.put(key, value);
@@ -128,7 +128,7 @@ public interface MenuMapper {
 
 
 
-    default List<PermDto.PermResponse> getPerms(List<TbRoleMenuPerm> roleMenuPerms) {
+    default List<PermDto.PermListResponse> getPerms(List<TbRoleMenuPerm> roleMenuPerms) {
         List<TbPerms> perms = roleMenuPerms.stream()
                 .map(TbRoleMenuPerm::getPerm)
                 .toList();
@@ -138,7 +138,7 @@ public interface MenuMapper {
                 .values());
 
         return  distinctPerms.stream()
-                .map(PermMapper.INSTANCE::entityToResponseDto)
+                .map(PermMapper.INSTANCE::entityToListResponseDTO)
                 .toList();
     }
 
