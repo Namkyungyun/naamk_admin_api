@@ -3,7 +3,7 @@ package kr.co.naamk.web.service.impl;
 import kr.co.naamk.domain.*;
 import kr.co.naamk.exception.ServiceException;
 import kr.co.naamk.exception.type.ServiceMessageType;
-import kr.co.naamk.web.dto.PermDto;
+import kr.co.naamk.web.dto.MenuDto;
 import kr.co.naamk.web.dto.mapstruct.MenuMapper;
 import kr.co.naamk.web.dto.type.PermActionType;
 import kr.co.naamk.web.repository.jpa.*;
@@ -32,12 +32,19 @@ public class MenuServiceImpl implements MenuService {
     private final RoleMenuPermService roleMenuPermService;
 
 
+    @Override
+    @Transactional(readOnly = true)
+    public TbMenus getMenu(Long menuId) {
+        return menuRepository.findById(menuId)
+                .orElseThrow(() -> new ServiceException(ServiceMessageType.MENU_NOT_FOUND));
+    }
+
     /** 메뉴 관리 > 생성
-     *  메뉴 생성 및 superadmin에게 자동으로 모든 권한 활성화로 생성.
+     *  메뉴 생성 및 역할-메뉴-권한 생성.
      * */
     @Override
     @Transactional
-    public void createMenu(CreateRequest dto) {
+    public void createMenu(MenuCreateRequest dto) {
         // 메뉴 조회
         Optional<TbMenus> menu = menuRepository.findByMenuCdIgnoreCase(dto.getMenuCd());
 
@@ -47,8 +54,34 @@ public class MenuServiceImpl implements MenuService {
         TbMenus savedMenu = menuRepository.save(MenuMapper.INSTANCE.requestDtoToEntity(dto));
 
         // 새 메뉴를 역할별로 권한 생성
-        roleMenuPermService.createRoleMenuPermsByMenu(savedMenu);
+        roleMenuPermService.createByMenu(savedMenu);
 
+    }
+
+    /** 메뉴 관리 > 수정
+     *  메뉴 수정 및 역할-메뉴-권한 또한 수정
+     * */
+    @Override
+    @Transactional
+    public void updateMenu(Long menuId, MenuUpdateRequest dto) {
+        // !! save로 진행하지 않을 것.
+        // 메뉴 조회
+        TbMenus menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new ServiceException(ServiceMessageType.MENU_NOT_FOUND, "menu id : " + menuId));
+
+        // 메뉴 수정
+        menu.setMenuCd(dto.getMenuCd());
+        menu.setMenuNm(dto.getMenuNm());
+        menu.setMenuDesc(dto.getMenuDesc());
+        menu.setOrderNum(dto.getOrderNum());
+        menu.setParentId(dto.getParentId());
+        menu.setPathUrl(dto.getPathUrl());
+        menu.setActivated(dto.isActivated());
+
+        menuRepository.save(menu);
+
+        // 권한 수정 (root -> el : role-menu-permit 데이터 삭제 필요 , el -> root : role-menu-permit 데이터 추가 필요)
+        roleMenuPermService.updatePermByMenu(menu);
     }
 
 
@@ -116,7 +149,6 @@ public class MenuServiceImpl implements MenuService {
         List<MenuTree> menuTreeList = MenuMapper.INSTANCE.objsToMenuTreeDTOS(menuTreeMap);
 
         // 검색 조건을 가진 자식 메뉴 조회
-        search.setRootMenu(false);
         List<TbMenus> childMenus  = menuQueryRepository.findMenusBySearch(search);
 
         // 검색 결과로 나온 자식 메뉴를 메뉴 트리에서 추출
@@ -137,8 +169,14 @@ public class MenuServiceImpl implements MenuService {
         search.setMenuIds(rootIds);
         List<TbMenus> rootMenus = menuQueryRepository.findMenusBySearch(search);
 
+
         // 메뉴 트리 만들기
-        return MenuMapper.INSTANCE.generateMenuTree(rootMenus, childMenus, menuTreeList, PermDto.PermResponse.class);
+        Map<Long, MenuDto.MenuTreeResponse> rootMenuMap = MenuMapper.INSTANCE.entityToMap(rootMenus);
+
+        rootMenus.addAll(childMenus);
+        Map<Long, MenuDto.MenuTreeResponse> allMenuMap = MenuMapper.INSTANCE.entityToMap(rootMenus);
+
+        return MenuMapper.INSTANCE.generateMenuTree(rootMenuMap, allMenuMap, menuTreeList);
     }
 
     // 검색 결과 조회된 메뉴를 메뉴트리 instance로 추출
@@ -200,13 +238,13 @@ public class MenuServiceImpl implements MenuService {
         search.setRoleIds(roleIds);
         search.setPermIds(List.of(permId));
         search.setDisplay(true);
+        search.setActivated(true);
 
         // 전체 메뉴 트리 재귀 쿼리 조회
         List<Map<String, Object>> menuTreeMap = menuRepository.nativeFindMenuTreeExceptionRoot();
         List<MenuTree> menuTreeList = MenuMapper.INSTANCE.objsToMenuTreeDTOS(menuTreeMap);
 
         // 하위 메뉴 조회
-        search.setRootMenu(false);
         List<TbMenus> childMenus = menuQueryRepository.findMenusBySearch(search);
 
         // 전체 root메뉴 조회
@@ -214,6 +252,11 @@ public class MenuServiceImpl implements MenuService {
         List<TbMenus> rootMenus = menuQueryRepository.findMenusBySearch(search);
 
         // 메뉴 트리 만들기
-        return MenuMapper.INSTANCE.generateMenuTree(rootMenus, childMenus, menuTreeList, PermDto.PermResponse.class);
+        Map<Long, MenuDto.MenuTreeResponse> rootMenuMap = MenuMapper.INSTANCE.entityToMap(rootMenus, roleIds);
+
+        rootMenus.addAll(childMenus);
+        Map<Long, MenuDto.MenuTreeResponse> allMenuMap = MenuMapper.INSTANCE.entityToMap(rootMenus, roleIds);
+
+        return MenuMapper.INSTANCE.generateMenuTree(rootMenuMap, allMenuMap, menuTreeList);
     }
 }

@@ -17,29 +17,6 @@ public class MenuController {
 
     private final MenuService menuService;
 
-    /** 로그인 > 메뉴 관리 > 메뉴 생성 및 수정 */
-    @RequestMapping(value="", method = RequestMethod.POST)
-    public Object createMenu(@RequestBody MenuDto.CreateRequest dto,
-                             HttpServletRequest request) {
-        menuService.createMenu(dto);
-
-        return APIResponseEntityBuilder.create().service(request)
-                .resultMessage(ServiceMessageType.SUCCESS)
-                .build();
-    }
-
-    /** 로그인 > 메뉴 관리 > 메뉴 삭제*/
-    @RequestMapping(value="/{menuId}", method = RequestMethod.DELETE)
-    public Object deleteMenu(@PathVariable("menuId") Long menuId,
-                             HttpServletRequest request) {
-
-        menuService.deleteMenu(menuId);
-
-        return APIResponseEntityBuilder.create().service(request)
-                .resultMessage(ServiceMessageType.SUCCESS)
-                .build();
-    }
-
     /** 로그인 > 메뉴탭  */
     @RequestMapping(value="/display-tree", method = RequestMethod.GET)
     public Object getDisplayMenuTree(@RequestParam Long userId, HttpServletRequest request) {
@@ -64,6 +41,53 @@ public class MenuController {
                 .entity(list)
                 .build();
     }
+
+
+    /** 로그인 > 메뉴 관리 > 메뉴 생성 */
+    @RequestMapping(value="", method = RequestMethod.POST)
+    public Object createMenu(@RequestBody MenuDto.MenuCreateRequest requestBody,
+                             HttpServletRequest request) {
+        menuService.createMenu(requestBody);
+
+        return APIResponseEntityBuilder.create().service(request)
+                .resultMessage(ServiceMessageType.SUCCESS)
+                .build();
+    }
+
+    /** 로그인 > 메뉴 관리 > 메뉴 정렬 수정 */
+    @RequestMapping(value = "/alignment", method = RequestMethod.PUT)
+    public Object updateMenuAlignment(@RequestBody List<MenuDto.MenuAlignmentUpdateRequest> requestBody,
+                                      HttpServletRequest request) {
+        // TODO
+        return APIResponseEntityBuilder.create().service(request)
+                .resultMessage(ServiceMessageType.SUCCESS)
+                .build();
+    }
+
+    /** 로그인 > 메뉴 관리 > 메뉴 상세 수정 */
+    @RequestMapping(value = "/{menuId}", method = RequestMethod.PUT)
+    public Object updateMenu(@PathVariable("menuId") Long menuId,
+                             @RequestBody MenuDto.MenuUpdateRequest requestBody,
+                             HttpServletRequest request) {
+        menuService.updateMenu(menuId, requestBody);
+
+        return APIResponseEntityBuilder.create().service(request)
+                .resultMessage(ServiceMessageType.SUCCESS)
+                .build();
+    }
+
+    /** 로그인 > 메뉴 관리 > 메뉴 삭제*/
+    @RequestMapping(value="/{menuId}", method = RequestMethod.DELETE)
+    public Object deleteMenu(@PathVariable("menuId") Long menuId,
+                             HttpServletRequest request) {
+
+        menuService.deleteMenu(menuId);
+
+        return APIResponseEntityBuilder.create().service(request)
+                .resultMessage(ServiceMessageType.SUCCESS)
+                .build();
+    }
+
 
     /** 로그인 > 메뉴 관리 > 메뉴 상세*/
     @RequestMapping(value="/{menuId}", method = RequestMethod.GET)

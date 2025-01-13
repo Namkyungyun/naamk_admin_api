@@ -31,6 +31,9 @@ public class MenuQueryRepository {
 
         if(!search.getRoleIds().isEmpty()) {
             predicate.and(roleMenuPerm.role.id.in(search.getRoleIds()));
+        }
+
+        if(search.isActivated()) {
             predicate.and(roleMenuPerm.activated.eq(true));
         }
 
@@ -53,6 +56,7 @@ public class MenuQueryRepository {
         if(!search.getMenuIds().isEmpty()) {
             predicate.or(menus.id.in(search.getMenuIds()));
         }
+
 
         return queryFactory.selectFrom(menus)
                 .join(menus.roleMenuPerms, roleMenuPerm)

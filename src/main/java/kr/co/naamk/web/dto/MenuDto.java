@@ -16,6 +16,7 @@ public class MenuDto {
     public static class Search {
         private boolean isDisplay;
         private boolean isRootMenu;
+        private boolean isActivated;
 
         private List<Long> permIds = new ArrayList<>();
         private List<Long> roleIds = new ArrayList<>();
@@ -26,7 +27,7 @@ public class MenuDto {
     }
 
     @Data
-    public static class CreateRequest {
+    public static class MenuCreateRequest {
         private String menuCd;
         private String menuNm;
         private String menuDesc;
@@ -34,6 +35,24 @@ public class MenuDto {
         private Long parentId;
         private String pathUrl;
         private boolean activated = true;
+    }
+
+    @Data
+    public static class MenuUpdateRequest {
+        private String menuCd;
+        private String menuNm;
+        private String menuDesc;
+        private Integer orderNum;
+        private Long parentId;
+        private String pathUrl;
+        private boolean activated = true;
+    }
+
+    @Data
+    public static class MenuAlignmentUpdateRequest {
+        private Long id;
+        private Long parentId;
+        private Integer orderNum;
     }
 
     @Data
