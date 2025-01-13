@@ -1,6 +1,8 @@
 package kr.co.naamk.web.service.impl;
 
 import kr.co.naamk.domain.TbRoles;
+import kr.co.naamk.exception.ServiceException;
+import kr.co.naamk.exception.type.ServiceMessageType;
 import kr.co.naamk.web.dto.RoleDto;
 import kr.co.naamk.web.dto.mapstruct.RoleMapper;
 import kr.co.naamk.web.repository.jpa.RoleRepository;
@@ -20,12 +22,19 @@ public class RoleServiceImpl implements RoleService {
     private final RoleMenuPermService roleMenuPermService;
 
     @Override
+    @Transactional(readOnly = true)
+    public TbRoles getRole(Long id) {
+        return roleRepository.findById(id)
+                .orElseThrow(() -> new ServiceException(ServiceMessageType.USER_NOT_FOUND));
+    }
+
+    @Override
     @Transactional
     public void createRole(RoleDto.RoleRequest roleDto) {
         TbRoles role = RoleMapper.INSTANCE.roleRequestDtoToEntity(roleDto);
 
         TbRoles savedRole = roleRepository.save(role);
-        roleMenuPermService.createRoleMenuPermsByRole(savedRole);
+        roleMenuPermService.createByRole(savedRole);
 
     }
 
