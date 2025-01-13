@@ -25,9 +25,9 @@ public interface UserMapper {
     UserDto.DetailResponse entityToDetailResponseDTO(TbUsers entity);
 
 
-    default List<RoleDto.RoleResponse> getRoleResponseDTOs(List<TbUserRole> userRoles) {
+    default List<RoleDto.RoleListResponse> getRoleResponseDTOs(List<TbUserRole> userRoles) {
         return userRoles.stream()
-                .map(userRole -> RoleMapper.INSTANCE.entityToRoleResponse(userRole.getRole()))
+                .map(userRole -> RoleMapper.INSTANCE.entityToListResponseDTO(userRole.getRole()))
                 .toList();
     }
 }

@@ -52,7 +52,7 @@ public class RoleMenuPermController {
     public Object createRoleMenuPermByRole(@PathVariable("roleId") Long roleId,
                                      HttpServletRequest request) {
 
-        TbRoles role = roleService.getRole(roleId);
+        TbRoles role = roleService.getRoleById(roleId);
         roleMenuPermService.createByRole(role);
 
         return APIResponseEntityBuilder.create().service(request)

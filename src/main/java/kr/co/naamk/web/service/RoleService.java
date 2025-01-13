@@ -7,9 +7,17 @@ import kr.co.naamk.web.dto.RoleDto;
 import java.util.List;
 
 public interface RoleService {
-    void createRole(RoleDto.RoleRequest role);
+    List<TbRoles> getRoles();
 
-    TbRoles getRole(Long id);
+    TbRoles getRoleById(Long id);
 
-    List<RoleDto.RoleResponse> getRoles(Long roleId);
+    void createRole(RoleDto.RoleCreateRequest dto);
+
+    void updateRole(Long id, RoleDto.RoleUpdateRequest dto);
+
+    void deleteRoleById(Long id);
+
+    RoleDto.RoleDetailResponse getDetailById(Long id);
+
+    List<RoleDto.RoleListResponse> getAll();
 }

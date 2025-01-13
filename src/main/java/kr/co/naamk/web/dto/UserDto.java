@@ -38,7 +38,7 @@ public class UserDto {
         private Timestamp lastLoginAt;
         private Timestamp createdAt;
         private Timestamp updatedAt;
-        private List<RoleDto.RoleResponse> roles = new ArrayList<>();
+        private List<RoleDto.RoleListResponse> roles = new ArrayList<>();
 
     }
 
@@ -54,7 +54,7 @@ public class UserDto {
         private Timestamp pwdExpiredAt;
         private Timestamp createdAt;
         private Timestamp updatedAt;
-        private List<RoleDto.RoleResponse> roles = new ArrayList<>();
+        private List<RoleDto.RoleListResponse> roles = new ArrayList<>();
     }
 
     @Data

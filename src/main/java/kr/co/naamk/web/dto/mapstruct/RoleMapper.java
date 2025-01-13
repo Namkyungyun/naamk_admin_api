@@ -12,9 +12,12 @@ import java.util.List;
 public interface RoleMapper {
     RoleMapper INSTANCE = Mappers.getMapper(RoleMapper.class);
 
-    TbRoles roleRequestDtoToEntity(RoleDto.RoleRequest dto);
+    TbRoles createRequestDTOToEntity(RoleDto.RoleCreateRequest dto);
 
-    RoleDto.RoleResponse entityToRoleResponse(TbRoles entity);
+    RoleDto.RoleDetailResponse entityToDetailResponseDTO(TbRoles role);
 
-    List<RoleDto.RoleResponse> entitiesToRoleResponseDTOs(List<TbRoles> entities);
+    RoleDto.RoleListResponse entityToListResponseDTO(TbRoles entity);
+
+    List<RoleDto.RoleListResponse> entitiesToListResponseDTOs(List<TbRoles> entities);
+
 }

@@ -24,6 +24,9 @@ public class TbRoles extends AuditEntity {
     @Column(name="role_cd", unique = true, nullable = false, length = 10)
     private String roleCd;
 
+    @Column(name="role_desc", length = 10)
+    private String roleDesc;
+
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<TbUserRole> userRoles = new ArrayList<>();
 
