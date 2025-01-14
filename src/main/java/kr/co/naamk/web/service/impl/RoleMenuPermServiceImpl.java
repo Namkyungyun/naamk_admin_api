@@ -6,12 +6,9 @@ import kr.co.naamk.exception.type.ServiceMessageType;
 import kr.co.naamk.web.dto.MenuDto;
 import kr.co.naamk.web.dto.RoleMenuPermDto.*;
 import kr.co.naamk.web.dto.mapstruct.MenuMapper;
-import kr.co.naamk.web.dto.type.BasePermType;
+import kr.co.naamk.web.dto.type.BasePermGrpType;
 import kr.co.naamk.web.dto.type.BaseRoleType;
-import kr.co.naamk.web.repository.jpa.RoleMenuPermsRepository;
-import kr.co.naamk.web.repository.jpa.MenuRepository;
-import kr.co.naamk.web.repository.jpa.PermRepository;
-import kr.co.naamk.web.repository.jpa.RoleRepository;
+import kr.co.naamk.web.repository.jpa.*;
 import kr.co.naamk.web.repository.queryDSL.MenuQueryRepository;
 import kr.co.naamk.web.service.RoleMenuPermService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoleMenuPermServiceImpl implements RoleMenuPermService {
 
-    private final PermRepository permRepository;
+    private final PermGrpRepository permGrpRepository;
     private final RoleRepository roleRepository;
     private final MenuRepository menuRepository;
 
@@ -104,13 +101,14 @@ public class RoleMenuPermServiceImpl implements RoleMenuPermService {
         boolean isRootMenu = menu.getParentId() == null;
 
         // 변경될 메뉴에 넣을 권한
-        List<TbPerms> allPerm = permRepository.findAll();
-        TbPerms readPerm = findReadPerm(allPerm);
-        List<TbPerms> permsForMenu = isRootMenu ? List.of(readPerm) : allPerm;
+        List<TbPerms> menuRootPerms = findPermByPermGrpCd(BasePermGrpType.MENU_ROOT.getCode());
+        List<TbPerms> menuBasePerms = findPermByPermGrpCd(BasePermGrpType.MENU_BASE.getCode());
+        List<TbPerms> permsForMenu = isRootMenu ? menuRootPerms : menuBasePerms;
 
         // menu 따른 모든 role-menu-perm data
         List<TbRoleMenuPerm> roleMenuPerms = menu.getRoleMenuPerms();
         if(isRootMenu) {
+            // root의 perm이 아닌 요소는 제거
             List<TbRoleMenuPerm> list = roleMenuPerms.stream()
                     .filter(el -> !permsForMenu.contains(el.getPerm()))
                     .toList();
@@ -118,8 +116,9 @@ public class RoleMenuPermServiceImpl implements RoleMenuPermService {
             roleMenuPerms.removeAll(list); // cascade delete
 
         } else {
+            // base perm이 아닌 요소는 제거
             List<TbRoles> roles = menu.getRoleMenuPerms().stream().map(TbRoleMenuPerm::getRole).toList();
-            List<TbPerms> perms = allPerm.stream().filter(el -> !el.equals(readPerm)).toList();
+            List<TbPerms> perms = menuBasePerms.stream().filter(el -> !el.equals(menuRootPerms)).toList();
 
             List<TbRoleMenuPerm> saveList = new ArrayList<>();
             for(TbRoles role : roles ) {
@@ -146,10 +145,9 @@ public class RoleMenuPermServiceImpl implements RoleMenuPermService {
         boolean isRootMenu = menu.getParentId() == null;
 
         // 퍼미션 가져오기
-        List<TbPerms> perms = permRepository.findAll();
-
-        TbPerms readPerm = findReadPerm(perms);
-        List<TbPerms> permsForMenu = isRootMenu ? List.of(readPerm) : perms;
+        List<TbPerms> menuRootPerms = findPermByPermGrpCd(BasePermGrpType.MENU_ROOT.getCode());
+        List<TbPerms> menuBasePerms = findPermByPermGrpCd(BasePermGrpType.MENU_BASE.getCode());
+        List<TbPerms> permsForMenu = isRootMenu ? menuRootPerms : menuBasePerms;
 
 
         // roles 에서 슈퍼어드민과 그외 역할들로 분리
@@ -188,10 +186,9 @@ public class RoleMenuPermServiceImpl implements RoleMenuPermService {
         // role의 코드가 슈퍼어드민인지
         boolean isSuperAdmin = BaseRoleType.SUPER_ADMIN.getCode().equals(role.getRoleCd());
 
-        // 메뉴에 대한 perms 모든 가져오기 -> TODO 추후 permission 디벨롭할 때 변경할 것.
-        List<TbPerms> perms = permRepository.findAll();
-        TbPerms readPerm = findReadPerm(perms);
-
+        // 메뉴에 대한 perms 가져오기
+        List<TbPerms> menuRootPerms = findPermByPermGrpCd(BasePermGrpType.MENU_ROOT.getCode());
+        List<TbPerms> menuBasePerms = findPermByPermGrpCd(BasePermGrpType.MENU_BASE.getCode());
 
         // menus 에서 루트메뉴와 그외 매뉴로 분리
         List<TbMenus> menus = menuRepository.findAll();
@@ -208,13 +205,13 @@ public class RoleMenuPermServiceImpl implements RoleMenuPermService {
 
         // rootMenu에 대한 role-menu-perm 을 만들기
         rootMenus.forEach(menu -> {
-            List<TbRoleMenuPerm> roleMenuPerms = generateRoleMenuPermByPermList(role, menu, List.of(readPerm), isSuperAdmin);
+            List<TbRoleMenuPerm> roleMenuPerms = generateRoleMenuPermByPermList(role, menu, menuRootPerms, isSuperAdmin);
             saveList.addAll(roleMenuPerms);
         });
 
         // 그 외 menus에 대한 role-menu-perm 을 만들기
         elseMenus.forEach(menu -> {
-            List<TbRoleMenuPerm> roleMenuPerms = generateRoleMenuPermByPermList(role, menu, perms, isSuperAdmin);
+            List<TbRoleMenuPerm> roleMenuPerms = generateRoleMenuPermByPermList(role, menu, menuBasePerms, isSuperAdmin);
             saveList.addAll(roleMenuPerms);
         });
 
@@ -232,11 +229,16 @@ public class RoleMenuPermServiceImpl implements RoleMenuPermService {
     }
 
 
-    private TbPerms findReadPerm(List<TbPerms> perms) {
-        return perms.stream()
-                .filter(perm -> BasePermType.READ.getCode().equals( perm.getPermCd()))
-                .findFirst()
-                .orElseThrow(() -> new ServiceException(ServiceMessageType.ROLE_NOT_FOUND, "not found read perm"));
+
+    private List<TbPerms> findPermByPermGrpCd(String permGrpCd) {
+        TbPermGrps permGrp = permGrpRepository.findByPermGrpCd(permGrpCd)
+                .orElseThrow(() -> new ServiceException(ServiceMessageType.PERMISSION_NOT_FOUND));
+
+
+        return permGrp.getPermGrpPerm().stream()
+                .filter(TbPermGrpPerm::isActivated)
+                .map(TbPermGrpPerm::getPerm)
+                .toList();
     }
 
 
