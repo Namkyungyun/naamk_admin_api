@@ -31,7 +31,7 @@ public enum ServiceMessageType {
     ROLE_MENU_PERMIT_NOT_FOUND(3005, "The requested role-menu-permit was not found."),
 
     // entity already exist
-    MENU_ALREADY_EXIST(3050, "The requested menu code already exist."),
+    ALREADY_EXIST(3050, "The requested data already exists."),
 
     // constraints data
     HAVE_CHILDREN_DATA(5001, "There is dependent children data.")

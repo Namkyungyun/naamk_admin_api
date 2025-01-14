@@ -10,7 +10,7 @@ spring:
     minimum-idle: 6
     max-lifetime: 240000
     maximum-pool-size: 200
-  auto-commit: false
+    auto-commit: false
   h2:
     console:
       enabled: true

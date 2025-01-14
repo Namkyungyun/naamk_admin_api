@@ -39,11 +39,15 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     public void createRole(RoleDto.RoleCreateRequest dto) {
+        boolean isExisting = roleRepository.existsByRoleCd(dto.getRoleCd());
+        if(isExisting) {
+            throw new ServiceException(ServiceMessageType.ALREADY_EXIST);
+        }
+
         TbRoles role = RoleMapper.INSTANCE.createRequestDTOToEntity(dto);
         TbRoles savedRole = roleRepository.save(role);
 
         roleMenuPermService.createByRole(savedRole);
-
     }
 
     @Override

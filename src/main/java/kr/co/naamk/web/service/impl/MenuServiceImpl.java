@@ -48,7 +48,7 @@ public class MenuServiceImpl implements MenuService {
         // 메뉴 조회
         Optional<TbMenus> menu = menuRepository.findByMenuCdIgnoreCase(dto.getMenuCd());
 
-        if(menu.isPresent()) throw new ServiceException(ServiceMessageType.MENU_ALREADY_EXIST);
+        if(menu.isPresent()) throw new ServiceException(ServiceMessageType.ALREADY_EXIST);
 
         // 메뉴 저장
         TbMenus savedMenu = menuRepository.save(MenuMapper.INSTANCE.requestDtoToEntity(dto));

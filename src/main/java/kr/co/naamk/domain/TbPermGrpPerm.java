@@ -4,27 +4,20 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 
+/** mapping table */
+
 @Entity
-@Table(name="tb_role_menu_perm")
-@IdClass(TbRoleMenuPermIds.class)
+@Table(name="tb_perm_grp_perm")
+@IdClass(TbPermGrpPermIds.class)
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 @Builder
-public class TbRoleMenuPerm {
-
+public class TbPermGrpPerm {
     @Id
     @ManyToOne
-    @JoinColumn(name="role_id")
-    @Comment("역할 ID")
-    private TbRoles role;
-
-
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "menu_id")
-    @Comment("메뉴 ID")
-    private TbMenus menu;
-
+    @JoinColumn(name="perm_grp_id")
+    @Comment("권한 그룹 ID")
+    private TbPermGrps permGrp;
 
     @Id
     @ManyToOne
@@ -32,7 +25,6 @@ public class TbRoleMenuPerm {
     @Comment("권한 ID")
     private TbPerms perm;
 
-
-    @Column(name="activated", nullable = false)
+    @Column(name="activated")
     private boolean activated;
 }
