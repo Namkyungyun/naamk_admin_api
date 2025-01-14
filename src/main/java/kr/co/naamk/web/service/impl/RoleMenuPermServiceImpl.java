@@ -6,8 +6,8 @@ import kr.co.naamk.exception.type.ServiceMessageType;
 import kr.co.naamk.web.dto.MenuDto;
 import kr.co.naamk.web.dto.RoleMenuPermDto.*;
 import kr.co.naamk.web.dto.mapstruct.MenuMapper;
-import kr.co.naamk.web.dto.type.PermActionType;
-import kr.co.naamk.web.dto.type.RoleType;
+import kr.co.naamk.web.dto.type.BasePermType;
+import kr.co.naamk.web.dto.type.BaseRoleType;
 import kr.co.naamk.web.repository.jpa.RoleMenuPermsRepository;
 import kr.co.naamk.web.repository.jpa.MenuRepository;
 import kr.co.naamk.web.repository.jpa.PermRepository;
@@ -128,7 +128,7 @@ public class RoleMenuPermServiceImpl implements RoleMenuPermService {
                     entity.setRole(role);
                     entity.setPerm(perm);
                     entity.setMenu(menu);
-                    entity.setActivated(role.getRoleCd().equals(RoleType.SUPER_ADMIN.getCode()));
+                    entity.setActivated(role.getRoleCd().equals(BaseRoleType.SUPER_ADMIN.getCode()));
 
                     saveList.add(entity);
                 }
@@ -186,7 +186,7 @@ public class RoleMenuPermServiceImpl implements RoleMenuPermService {
     @Transactional
     public void createByRole(TbRoles role) {
         // role의 코드가 슈퍼어드민인지
-        boolean isSuperAdmin = RoleType.SUPER_ADMIN.getCode().equals(role.getRoleCd());
+        boolean isSuperAdmin = BaseRoleType.SUPER_ADMIN.getCode().equals(role.getRoleCd());
 
         // 메뉴에 대한 perms 모든 가져오기 -> TODO 추후 permission 디벨롭할 때 변경할 것.
         List<TbPerms> perms = permRepository.findAll();
@@ -226,7 +226,7 @@ public class RoleMenuPermServiceImpl implements RoleMenuPermService {
 
     private TbRoles findSuperAdmin(List<TbRoles> roles) {
         return roles.stream()
-                .filter(role -> RoleType.SUPER_ADMIN.getCode().equals(role.getRoleCd()))
+                .filter(role -> BaseRoleType.SUPER_ADMIN.getCode().equals(role.getRoleCd()))
                 .findFirst()
                 .orElseThrow(() -> new ServiceException(ServiceMessageType.ROLE_NOT_FOUND, "not found super admin"));
     }
@@ -234,7 +234,7 @@ public class RoleMenuPermServiceImpl implements RoleMenuPermService {
 
     private TbPerms findReadPerm(List<TbPerms> perms) {
         return perms.stream()
-                .filter(perm -> PermActionType.READ.getCode().equals( perm.getPermCd()))
+                .filter(perm -> BasePermType.READ.getCode().equals( perm.getPermCd()))
                 .findFirst()
                 .orElseThrow(() -> new ServiceException(ServiceMessageType.ROLE_NOT_FOUND, "not found read perm"));
     }

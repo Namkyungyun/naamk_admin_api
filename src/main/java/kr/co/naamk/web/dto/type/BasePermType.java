@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum PermActionType {
+public enum BasePermType {
     CREATE("C", "생성"),
     READ("R", "조회"),
     UPDATE("U", "수정"),

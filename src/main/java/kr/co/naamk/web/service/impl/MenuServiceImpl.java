@@ -5,7 +5,7 @@ import kr.co.naamk.exception.ServiceException;
 import kr.co.naamk.exception.type.ServiceMessageType;
 import kr.co.naamk.web.dto.MenuDto;
 import kr.co.naamk.web.dto.mapstruct.MenuMapper;
-import kr.co.naamk.web.dto.type.PermActionType;
+import kr.co.naamk.web.dto.type.BasePermType;
 import kr.co.naamk.web.repository.jpa.*;
 import kr.co.naamk.web.repository.queryDSL.MenuQueryRepository;
 import kr.co.naamk.web.service.MenuService;
@@ -229,7 +229,7 @@ public class MenuServiceImpl implements MenuService {
                 .toList();
 
         // 조회 권한 id 조회
-        Long permId = permRepository.findByPermCd(PermActionType.READ.getCode())
+        Long permId = permRepository.findByPermCd(BasePermType.READ.getCode())
                 .orElseThrow(()-> new ServiceException(ServiceMessageType.PERMISSION_NOT_FOUND))
                 .getId();
 
