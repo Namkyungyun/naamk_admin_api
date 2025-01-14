@@ -2,13 +2,17 @@ package kr.co.naamk.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Comment;
 
 import java.util.Objects;
 
 @Getter @Setter
 public class TbPermGrpPermIds {
-    private Long perm;
+    @Comment("권한 그룹 ID")
     private Long permGrp;
+
+    @Comment("권한 ID")
+    private Long perm;
 
     @Override
     public boolean equals(Object o) {

@@ -16,15 +16,14 @@ public class TbPermGrpPerm {
     @Id
     @ManyToOne
     @JoinColumn(name="perm_grp_id")
-    @Comment("권한 그룹 ID")
     private TbPermGrps permGrp;
 
     @Id
     @ManyToOne
     @JoinColumn(name="perm_id")
-    @Comment("권한 ID")
     private TbPerms perm;
 
     @Column(name="activated")
+    @Comment("활성여부")
     private boolean activated;
 }

@@ -2,6 +2,7 @@ package kr.co.naamk.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Comment;
 
 @Entity
 @Table(name="tb_user_role")

@@ -17,6 +17,7 @@ public class TbMenus extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
+    @Comment("메뉴 PK")
     private Long id;
 
     @Column(name="menu_cd", unique = true, nullable = false, length = 10)

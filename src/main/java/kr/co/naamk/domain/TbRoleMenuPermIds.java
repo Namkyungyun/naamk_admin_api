@@ -1,15 +1,21 @@
 package kr.co.naamk.domain;
 
 import lombok.*;
+import org.hibernate.annotations.Comment;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @Getter @Setter
 public class TbRoleMenuPermIds implements Serializable {
-    private Long menu;
-    private Long perm;
+    @Comment("역할 ID")
     private Long role;
+
+    @Comment("메뉴 ID")
+    private Long menu;
+
+    @Comment("권한 ID")
+    private Long perm;
 
     @Override
     public boolean equals(Object o) {

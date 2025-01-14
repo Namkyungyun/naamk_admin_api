@@ -3,13 +3,16 @@ package kr.co.naamk.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Comment;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @Getter @Setter
 public class TbUserRoleIds implements Serializable {
+    @Comment("사용자 ID")
     private Long user;
+    @Comment("역할 ID")
     private Long role;
 
     @Override
