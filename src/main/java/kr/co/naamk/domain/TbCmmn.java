@@ -18,9 +18,10 @@ public class TbCmmn extends AuditEntity {
     @Comment("PK ID")
     private Long id;
 
-    @Column(name="cmmn_grp_id", nullable = false)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cmmn_grp_id", referencedColumnName = "id")
     @Comment("공통 코드 그룹 아이디")
-    private Long cmmnGrpId;
+    private TbCmmnGrp cmmnGrp;
 
     @Column(name="cmmn_cd", nullable = false, unique = true)
     @Comment("공통 코드")
