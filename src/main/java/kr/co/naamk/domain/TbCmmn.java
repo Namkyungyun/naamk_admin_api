@@ -6,7 +6,9 @@ import lombok.*;
 import org.hibernate.annotations.Comment;
 
 @Entity
-@Table(name="tb_cmmn")
+@Table(name="tb_cmmn", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"cmmn_grp_id", "cmmn_cd"})
+})
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 @Builder
@@ -18,8 +20,8 @@ public class TbCmmn extends AuditEntity {
     @Comment("PK ID")
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cmmn_grp_id", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cmmn_grp_id")
     @Comment("공통 코드 그룹 아이디")
     private TbCmmnGrp cmmnGrp;
 

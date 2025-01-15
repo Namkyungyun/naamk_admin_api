@@ -29,6 +29,7 @@ public enum ServiceMessageType {
     PERMISSION_NOT_FOUND(3003, "The requested permission was not found."),
     MENU_NOT_FOUND(3004, "The requested menu was not found."),
     ROLE_MENU_PERMIT_NOT_FOUND(3005, "The requested role-menu-permit was not found."),
+    COMMON_CODE_NOT_FOUND(3006, "The requested common code was not found."),
 
     // entity already exist
     ALREADY_EXIST(3050, "The requested data already exists."),

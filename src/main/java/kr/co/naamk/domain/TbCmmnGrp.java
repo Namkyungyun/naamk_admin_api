@@ -5,6 +5,9 @@ import kr.co.naamk.domain.audit.AuditEntity;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="tb_cmmn_grp")
 @Getter @Setter
@@ -33,5 +36,8 @@ public class TbCmmnGrp extends AuditEntity {
     @Column(name="activated")
     @Comment("활성 여부")
     private boolean activated;
+
+    @OneToMany(mappedBy = "cmmnGrp", cascade= CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<TbCmmn> cmmns = new ArrayList<>();
 
 }
