@@ -50,5 +50,12 @@ sync:
   thread:
     pool: 5
 
+#logging:
+#  level:
+#    org:
+#      springframework:
+#        transaction:
+#          interceptor:  trace
+
 
 
