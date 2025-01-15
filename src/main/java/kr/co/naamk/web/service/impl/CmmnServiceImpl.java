@@ -11,6 +11,7 @@ import kr.co.naamk.web.repository.jpa.CmmnRepository;
 import kr.co.naamk.web.service.CmmnService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -24,6 +25,7 @@ public class CmmnServiceImpl implements CmmnService {
 
     /******** 공통 그룹 코드 ********/
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public CmmnGrpCreateResponse createCmmnGrp(CmmnGrpCreateRequest dto) {
         // 이미 조재하는 그룹 코드인지 확인
         boolean isExisting = cmmnGrpRepository.existsByCmmnGrpCd(dto.getCmmnGrpCd());
@@ -41,6 +43,7 @@ public class CmmnServiceImpl implements CmmnService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateCmmnGrp(Long cmmnGrpId, CmmnGrpUpdateRequest dto) {
         TbCmmnGrp cmmnGrp = getCmmnGrpById(cmmnGrpId);
 
@@ -52,12 +55,14 @@ public class CmmnServiceImpl implements CmmnService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteCmmnGrp(Long cmmnGrpId) {
         TbCmmnGrp cmmnGrp = getCmmnGrpById(cmmnGrpId);
         cmmnGrpRepository.delete(cmmnGrp);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CmmnGrpListResponse> getAllCmmnGrps() {
         List<TbCmmnGrp> cmmnGrps = cmmnGrpRepository.findAll();
 
@@ -65,6 +70,7 @@ public class CmmnServiceImpl implements CmmnService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CmmnGrpDetailResponse getDetailCmmnGrp(Long cmmnGrpId) {
         // 그룹코드 조회
         TbCmmnGrp cmmnGrp = getCmmnGrpById(cmmnGrpId);
@@ -80,8 +86,9 @@ public class CmmnServiceImpl implements CmmnService {
 
     /******** 공통 코드 ********/
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void createCmmn(Long cmmnGrpId, CmmnCreateRequest dto) {
-        boolean isExisting = cmmnRepository.existsByCmmnCdAndCmmnGrp(dto.getCmmnCd(), cmmnGrpId);
+        boolean isExisting = cmmnRepository.existsByCmmnCdAndCmmnGrpId(dto.getCmmnCd(), cmmnGrpId);
         if(isExisting) {
             throw new ServiceException(ServiceMessageType.ALREADY_EXIST);
         }
@@ -91,6 +98,7 @@ public class CmmnServiceImpl implements CmmnService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateCmmn(Long cmmnId, CmmnUpdateRequest dto) {
         TbCmmn cmmn = getCmmnById(cmmnId);
 
@@ -104,12 +112,14 @@ public class CmmnServiceImpl implements CmmnService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteCmmn(Long cmmnId) {
         TbCmmn cmmn = getCmmnById(cmmnId);
         cmmnRepository.delete(cmmn);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CmmnListResponse> getAllCmmnsByGrpId(Long cmmnGrpId) {
         // 그룹코드 조회
         TbCmmnGrp cmmnGrp = getCmmnGrpById(cmmnGrpId);
@@ -122,6 +132,7 @@ public class CmmnServiceImpl implements CmmnService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CmmnDetailResponse getDetailCmmnByCmmnGrpId(Long cmmnGrpId, Long cmmnId) {
         TbCmmn cmmn = getCmmnById(cmmnId);
 
@@ -134,6 +145,7 @@ public class CmmnServiceImpl implements CmmnService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public CmmnDetailResponse getDetailCmmn(Long cmmnId) {
         TbCmmn cmmn = getCmmnById(cmmnId);
 
