@@ -1,35 +1,24 @@
 spring:
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:test;MODE=PostgreSQL
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/nk_dev?currentSchema=naamk_bank&useunicode=true&characterencoding=utf-8
     username : naamk
     password: naamk_password
-  # 초기 필요 schema, data load
-  hikari:
-    connection-timeout: 3000
-    validation-timeout: 3000
-    minimum-idle: 6
-    max-lifetime: 240000
-    maximum-pool-size: 200
-  auto-commit: false
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    hikari:
+      connection-timeout: 3000
+      validation-timeout: 3000
+      minimum-idle: 6
+      max-lifetime: 240000
+      maximum-pool-size: 200
+      auto-commit: false
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
       naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
     properties:
       '[hibernate.default_batch_fetch_size]' : 100
-      '[hibernate.format_sql]': true
-    show-sql: true
-    output:
-      ansi:
-        enabled: always
 
 logging:
   level:
-    '[kr.co.naamkbank]': DEBUG
-    '[org.hibernate.type]': TRACE
+    '[kr.co.naamk]': INFO
