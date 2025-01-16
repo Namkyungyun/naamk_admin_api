@@ -49,12 +49,4 @@ class SecurityConfigTest {
         // then
         assertThat(httpStatusCode).isEqualTo(200);
     }
-
-    @Test
-    void authentication_test3() throws Exception {
-        System.out.println("commit test");
-    }
-
-
-
 }
