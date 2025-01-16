@@ -14,7 +14,7 @@ spring:
   profiles:
     active: local
   application:
-    name: naamk-bank
+    name: naamk-admin-api
   config:
     import:
       - classpath:${spring.profiles.active}/dataSource.yml
