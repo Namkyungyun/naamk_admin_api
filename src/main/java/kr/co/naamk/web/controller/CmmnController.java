@@ -92,7 +92,7 @@ public class CmmnController {
     }
 
     // TODO [수정]
-    @RequestMapping(value = COMMON_GROUP + "/{id}" + COMMON, method = RequestMethod.PUT)
+    @RequestMapping(value = COMMON + "/{id}", method = RequestMethod.PUT)
     public Object updateCmmn(@PathVariable("id") Long id,
                              @RequestBody CmmnDto.CmmnUpdateRequest dto,
                              HttpServletRequest request) {

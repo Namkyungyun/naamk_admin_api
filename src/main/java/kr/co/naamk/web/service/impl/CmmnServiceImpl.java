@@ -94,6 +94,9 @@ public class CmmnServiceImpl implements CmmnService {
         }
 
         TbCmmn cmmn = CmmnMapper.INSTANCE.cmmnCreateRequestDtoToEntity(dto);
+        TbCmmnGrp cmmnGrp = getCmmnGrpById(cmmnGrpId);
+        cmmn.setCmmnGrp(cmmnGrp);
+
         cmmnRepository.save(cmmn);
     }
 
