@@ -19,8 +19,8 @@ public enum ServiceMessageType {
 
 
     // authorization
-    SC_UNAUTHORIZED(4001, "클라이언트가 인증되지 않았기 때문에 요청을 정상적으로 처리할 수 없습니다."),
-    SC_FORBIDDEN(4003, "클라이언트가 해당 요청에 대한 권한이 없습니다."),
+    SC_UNAUTHORIZED(4001, "클라이언트가 인증되지 않았기 때문에 요청을 정상적으로 처리할 수 없습니다."), // 인증 없이 api 요청한 경우
+    SC_FORBIDDEN(4003, "클라이언트가 해당 요청에 대한 권한이 없습니다."), // 인증은 되었으나 권한이 없는 경우
 
 
     // entity not found
