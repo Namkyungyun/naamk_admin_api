@@ -13,19 +13,19 @@ import org.hibernate.annotations.Comment;
 public class TbRoleMenuPerm {
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="role_id")
     private TbRoles role;
 
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_id")
     private TbMenus menu;
 
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="perm_id")
     private TbPerms perm;
 

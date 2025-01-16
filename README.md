@@ -1,6 +1,44 @@
 # Getting Started
 
-### INIT DATA API 호출
+## JPA CreatedAt, UpdatedAt 자동 생성
+- @EnableJpaAuditing -> Main class
+- @EntityListeners( value = { AuditingEntityListener.class} ) -> abstract AuditEntity 클래스에 넣고 다른 도메인들은 이를 상속받는 형식으로 진행
+```java
+@EntityListeners( value = { AuditingEntityListener.class} )
+@MappedSuperclass
+public abstract class AuditEntity {
+
+    @CreatedDate
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    @Column(name = "created_at", updatable = false)
+    @Comment("생성일자")
+    private Timestamp createdAt;
+
+    @LastModifiedDate
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    @Column(name = "updated_at")
+    @Comment("수정일자")
+    private Timestamp updatedAt;
+
+}
+```
+
+## Entity 칼럼으로 Enum 넣기
+```java
+@Table 
+@Entity 
+public class AEntity {
+    ...
+    @Column
+    @Enumerated(EnumType.STRING)
+    private BEnum enumValue;
+}
+```
+
+
+## INIT DATA API 호출
 #### 권한 일반
 ```
  curl -X POST 'localhost:28080/perms' \

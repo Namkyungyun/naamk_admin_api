@@ -14,12 +14,12 @@ import org.hibernate.annotations.Comment;
 @Builder
 public class TbPermGrpPerm {
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="perm_grp_id")
     private TbPermGrps permGrp;
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="perm_id")
     private TbPerms perm;
 
