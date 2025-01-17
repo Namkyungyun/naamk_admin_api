@@ -32,9 +32,11 @@ public class TbRoles extends AuditEntity {
     @Comment("역할 설명")
     private String roleDesc;
 
+    @Builder.Default
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<TbUserRole> userRoles = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<TbRoleMenuPerm> menuPerms = new ArrayList<>();
 

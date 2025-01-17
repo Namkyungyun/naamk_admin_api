@@ -53,6 +53,7 @@ public class TbUsers extends AuditEntity {
     @Comment("로그인 패스워드 만료일자")
     private Timestamp pwdExpiredAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade= CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<TbUserRole> userRoles = new ArrayList<>();
 

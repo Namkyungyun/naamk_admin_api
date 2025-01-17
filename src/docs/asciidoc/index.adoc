@@ -1,0 +1,112 @@
+= API Documentation
+:doctype: book
+:toc-title: Table of Contents
+:source-highlighter: rouge
+:toc: left
+:toclevels: 2
+:sectnums:
+:seclinks:
+
+
+RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its use of HTTP verbs.
+
+
+|===
+| Verb | Usage
+
+| `GET`
+| Used to retrieve a resource
+
+| `POST`
+| Used to create a new resource
+
+| `PUT`
+| Used to update an existing resource
+
+| `DELETE`
+| Used to delete an existing resource
+|===
+
+RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its use of HTTP status codes.
+
+
+|===
+| Status code | Usage
+
+| `200 OK`
+| The request completed successfully
+
+| `201 Created`
+| A new resource has been created successfully. The resource's URI is available from the response's
+`Location` header
+
+| `204 No Content`
+| An update to an existing resource has been applied successfully
+
+| `400 Bad Request`
+| The request was malformed. The response body will include an error providing further information
+
+| `404 Not Found`
+| The requested resource did not exist
+
+| `500 Internal Server Error`
+| Internal Server Exceptions
+
+|===
+
+= Api Document
+
+== Error Response
+Error Common message Structure which, explanation of ServiceMessageType
+
+|===
+|Path|Type|Description
+
+|`+header+`
+|`+Object+`
+|헤더선언문
+
+|`+header.responseTime+`
+|`+String+`
+|결과받은시간
+
+|`+header.actionMethod+`
+|`+String+`
+|호출 Http Method
+
+|`+header.actionUrl+`
+|`+String+`
+|호출 url
+
+|`+header.resultCode+`
+|`+Number+`
+|결과코드
+
+|`+header.resultMessage+`
+|`+String+`
+|결과메세지
+
+|`+header.detailMessage+`
+|`+String+`
+|결과상세메세지
+
+|===
+
+
+[source,http,options="nowrap"]
+{
+  "responseHeader": {
+    "responseTime": null,
+    "actionUrl": null,
+    "resultCode": 906,
+    "resultMessage": "ERROR_SQL",
+    "detailMessage": "could not execute statement ..."
+  },
+  ...
+}
+
+
+== COMMON (공통 코드 API)
+
+include::{docdir}/cmmn.adoc[]
+

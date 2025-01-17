@@ -1,0 +1,11 @@
+=== Create Common Group Code `( 공통 그룹 코드 생성 )`
+
+이 API는 공통 그룹 코드를 생성하는 기능을 제공합니다.
+
+[NOTE]
+====
+- 그룹 코드 값은 중복이 허용되지 않습니다.
+- 요청 및 응답 예시는 아래를 참조하세요.
+====
+operation::cmmn-controller-test/create-cmmn-grp[snippets="curl-request,request-fields,http-request"]
+operation::cmmn-controller-test/create-cmmn-grp[snippets="response-fields,http-response"]

@@ -18,6 +18,7 @@ public interface CmmnMapper {
     /** common group code */
     CmmnDto.CmmnGrpDetailResponse entityToCmmnGrpDetailResponseDTO(TbCmmnGrp entity);
 
+    @Mapping(target = "cmmns", expression = "java(new ArrayList<>())")
     TbCmmnGrp cmmnGrpCreateRequestDtoToEntity(CmmnDto.CmmnGrpCreateRequest dto);
 
     CmmnDto.CmmnGrpListResponse entityToCmmnGrpListResponseDTO(TbCmmnGrp entity);

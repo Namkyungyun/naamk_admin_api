@@ -32,9 +32,11 @@ public class TbPerms extends AuditEntity {
     @Comment("권한 설명")
     private String permDesc;
 
+    @Builder.Default
     @OneToMany(mappedBy = "perm", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<TbRoleMenuPerm> roleMenuPerms = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "perm", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<TbPermGrpPerm> permGrpPerm = new ArrayList<>();
 }

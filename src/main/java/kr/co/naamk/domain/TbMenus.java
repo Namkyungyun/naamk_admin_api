@@ -48,6 +48,7 @@ public class TbMenus extends AuditEntity {
     @Comment("활성여부")
     private boolean activated;
 
+    @Builder.Default
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, fetch= FetchType.LAZY, orphanRemoval = true)
     private List<TbRoleMenuPerm> roleMenuPerms = new ArrayList<>();
 

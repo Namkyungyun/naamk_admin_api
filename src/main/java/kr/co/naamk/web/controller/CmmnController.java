@@ -91,7 +91,7 @@ public class CmmnController {
                 .build();
     }
 
-    // TODO [수정]
+    // [수정] 특정 그룹 상관없이 공통 코드 수정
     @RequestMapping(value = COMMON + "/{id}", method = RequestMethod.PUT)
     public Object updateCmmn(@PathVariable("id") Long id,
                              @RequestBody CmmnDto.CmmnUpdateRequest dto,
@@ -103,7 +103,7 @@ public class CmmnController {
                 .build();
     }
 
-    // TODO [삭제]
+    // [삭제] 특정 그룹 상관없이 공통 코드 수정
     @RequestMapping(value = COMMON + "/{id}", method = RequestMethod.DELETE)
     public Object deleteCmmn(@PathVariable("id") Long id,
                              HttpServletRequest request) {

@@ -1,4 +1,4 @@
-package kr.co.naamk.config.security;
+package kr.co.naamk.security;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

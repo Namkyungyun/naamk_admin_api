@@ -1,5 +1,6 @@
 package kr.co.naamk.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ public class CmmnDto {
         private String cmmnGrpCd;
         private String cmmnGrpNm;
         private String cmmnGrpDesc;
-        private String activated;
+        private boolean activated;
     }
 
     @Data @Builder
@@ -34,7 +35,9 @@ public class CmmnDto {
         private String cmmnGrpCd;
         private String cmmnGrpNm;
         private String activated;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp createdAt;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp updatedAt;
     }
 
@@ -45,7 +48,9 @@ public class CmmnDto {
         private String cmmnGrpNm;
         private String cmmnGrpDesc;
         private String activated;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp createdAt;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp updatedAt;
     }
 
@@ -86,7 +91,9 @@ public class CmmnDto {
         private String cmmnDesc;
         private Integer orderNum;
         private boolean activated;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp createdAt;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp updatedAt;
     }
 }

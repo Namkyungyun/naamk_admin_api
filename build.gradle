@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.0'
     id 'io.spring.dependency-management' version '1.1.6'
+    id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
 group = 'kr.co'
@@ -13,7 +14,23 @@ java {
     }
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += [
+            '-Amapstruct.suppressGeneratorTimestamp=true',
+            '-Amapstruct.suppressGeneratorVersionInfoComment=true',
+            '-Amapstruct.verbose=true',
+            '-Amapstruct.unmappedTargetPolicy=IGNORE'
+    ]
+}
+
+
+javadoc {
+    options.encoding = 'UTF-8'
+}
+
 configurations {
+    asciidoctorExtensions
     compileOnly {
         extendsFrom annotationProcessor
     }
@@ -24,6 +41,7 @@ ext {
     queryDSLVersion = "5.0.0"
     jjwtVersion = "0.12.6"
     jasyptVersion = "3.0.5"
+    snippetsDir = file("build/generated-snippets")
 }
 
 repositories {
@@ -69,14 +87,33 @@ dependencies {
     //////////// test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
     testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
+    testImplementation 'org.junit.platform:junit-platform-launcher'
+    testImplementation('org.junit.jupiter:junit-jupiter')
+    testImplementation('org.junit.jupiter:junit-jupiter-api')
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine')
+
+    // Spring REST Docs
+    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+
+
+
 }
 
+test {
+    outputs.dir snippetsDir
+    useJUnitPlatform()
+}
+
+/**
+ * QueryDSL
+ * */
 def querydslDir = "src/main/generated"
 
 sourceSets {
@@ -87,15 +124,44 @@ tasks.withType(JavaCompile) {
     options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
+/**
+ * REST DOCS
+ * */
+asciidoctor {
+    configurations 'asciidoctorExtensions'
+    inputs.dir snippetsDir
+    dependsOn test
+    sources {
+        include("**/index.adoc")
+    }
+    // 다크테마
+    attributes 'source-highlighter': 'highlight.js'
+    //Asciidoctor에 snippetsDir 경로를 전달하여 스니펫 참조를 가능함
+    attributes 'snippets': snippetsDir
+    // 경로를 baseDir로 맞춰준다!
+    baseDirFollowsSourceFile()
+}
+
+task copyDocument(type: Copy) { // (12)
+    dependsOn asciidoctor
+     from("${asciidoctor.outputDir}") {
+         include("**/index.html")
+     }
+     into file("src/main/resources/static/docs")
 }
 
 build.doFirst {
     delete file('build/generated/**')
 }
 
+build {
+    dependsOn copyDocument
+}
 
 clean {
     delete file(querydslDir)
+}
+
+clean.doLast {
+    file(querydslDir).deleteDir()
 }

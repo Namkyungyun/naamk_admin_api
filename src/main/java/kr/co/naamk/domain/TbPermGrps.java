@@ -31,6 +31,7 @@ public class TbPermGrps extends AuditEntity {
     @Comment("권한 그룹 설명")
     private String permGrpDesc;
 
+    @Builder.Default
     @OneToMany(mappedBy = "permGrp", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<TbPermGrpPerm> permGrpPerm = new ArrayList<>();
 }
