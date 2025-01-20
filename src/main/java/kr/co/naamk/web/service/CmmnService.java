@@ -10,7 +10,7 @@ public interface CmmnService {
     CmmnGrpCreateResponse createCmmnGrp(CmmnGrpCreateRequest dto);
 
     // [수정] 공통 그룹 코드 수정
-    void updateCmmnGrp(Long cmmnGrpId, CmmnGrpUpdateRequest dto);
+    CmmnGrpDetailResponse updateCmmnGrp(Long cmmnGrpId, CmmnGrpUpdateRequest dto);
 
     // [삭제] 공통 그룹 코드 삭제
     void deleteCmmnGrp(Long cmmnGrpId);

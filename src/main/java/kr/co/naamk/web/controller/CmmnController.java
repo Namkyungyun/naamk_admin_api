@@ -37,10 +37,11 @@ public class CmmnController {
     public Object updateCmmnGrp(@PathVariable("grpId") Long grpId,
                             @RequestBody CmmnDto.CmmnGrpUpdateRequest dto,
                             HttpServletRequest request) {
-        cmmnService.updateCmmnGrp(grpId, dto);
+        CmmnDto.CmmnGrpDetailResponse result = cmmnService.updateCmmnGrp(grpId, dto);
 
         return APIResponseEntityBuilder.create().service(request)
                 .resultMessage(ServiceMessageType.SUCCESS)
+                .entity(result)
                 .build();
     }
 

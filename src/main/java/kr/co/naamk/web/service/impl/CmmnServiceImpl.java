@@ -37,6 +37,7 @@ public class CmmnServiceImpl implements CmmnService {
         TbCmmnGrp cmmnGrp = CmmnMapper.INSTANCE.cmmnGrpCreateRequestDtoToEntity(dto);
         TbCmmnGrp savedEntity = cmmnGrpRepository.save(cmmnGrp);
 
+
         return CmmnGrpCreateResponse.builder()
                 .id(savedEntity.getId())
                 .build();
@@ -44,14 +45,16 @@ public class CmmnServiceImpl implements CmmnService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateCmmnGrp(Long cmmnGrpId, CmmnGrpUpdateRequest dto) {
+    public CmmnGrpDetailResponse updateCmmnGrp(Long cmmnGrpId, CmmnGrpUpdateRequest dto) {
         TbCmmnGrp cmmnGrp = getCmmnGrpById(cmmnGrpId);
 
         cmmnGrp.setCmmnGrpNm(dto.getCmmnGrpNm());
         cmmnGrp.setCmmnGrpDesc(dto.getCmmnGrpDesc());
         cmmnGrp.setActivated(dto.isActivated());
 
-        cmmnGrpRepository.save(cmmnGrp);
+        TbCmmnGrp savedEntity = cmmnGrpRepository.save(cmmnGrp);
+
+        return CmmnMapper.INSTANCE.entityToCmmnGrpDetailResponseDTO(savedEntity);
     }
 
     @Override

@@ -119,7 +119,15 @@ class CmmnControllerTest extends RestDocsSupport {
                                 fieldWithPath("header.resultCode").type(JsonFieldType.NUMBER).description("결과코드"),
                                 fieldWithPath("header.resultMessage").type(JsonFieldType.STRING).description("결과메세지"),
                                 fieldWithPath("header.detailMessage").type(JsonFieldType.STRING).description("결과상세메세지"),
-                                fieldWithPath("body").type(JsonFieldType.OBJECT).description("바디선언문")
+                                fieldWithPath("body").type(JsonFieldType.OBJECT).description("바디선언문"),
+                                fieldWithPath("body.entity").type(JsonFieldType.OBJECT).description("데이터부선언문"),
+                                fieldWithPath("body.entity.id").type(JsonFieldType.NUMBER).description("공통 그룹 SEQ"),
+                                fieldWithPath("body.entity.cmmnGrpCd").type(JsonFieldType.STRING).description("공통 그룹 코드"),
+                                fieldWithPath("body.entity.cmmnGrpNm").type(JsonFieldType.STRING).description("공통 그룹 명"),
+                                fieldWithPath("body.entity.cmmnGrpDesc").type(JsonFieldType.STRING).description("공통 그룹 명"),
+                                fieldWithPath("body.entity.activated").type(JsonFieldType.STRING).description("공통 그룹 사용 여부"),
+                                fieldWithPath("body.entity.createdAt").type(JsonFieldType.STRING).description("공통 그룹 생성일"),
+                                fieldWithPath("body.entity.updatedAt").type(JsonFieldType.STRING).description("공통 그룹 수정일")
                         )
                 ))
                 .andReturn();
