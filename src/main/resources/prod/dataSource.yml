@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ENC(0CkDvUs30WpR/oYzawpbXO4Z1o+/MXzTkcBjdKiVo+0Bi7fisOhzZeYKwob1QqtV+ZbPgT+9GqZGAu4pN6smOm7R+e9LRT5lHDYRL5Zer28ZiPAj7jtm6cU0IWGXTqvKD4CjtOO1v12XRpRuyPsywq757nPsh7cTispc1MQt/oQLqIc8hkEszt95BJkDwq7x)
+    url: ENC(o441akJTqhKfFqit/yMccXsQow5jamewlWPwPPZb80Gf1l12l65Eu+QTk0Ah54ZTb8SRLQSfMoL38ssezun+U74YLeQAAE59xBk2UWdYb+77qX4+XJrewfeEAHs//43XbssruhC0XNK+5kTXB4a+SA==)
     username : ENC(BzQK0/38GkerJgfs8ILakyvTbKznpHwQyMzR12UDHvCMSMhjPerCR7pociI/5MGb)
     password: ENC(lnsSMnBSRJNSUisnaVVMLNov5Au5cJw2oQCsllyqErQMTDWSqIZIEjAVxTQ3MFWs)
     hikari:
@@ -17,7 +17,9 @@ spring:
       ddl-auto: update
       naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
     properties:
-      '[hibernate.default_batch_fetch_size]' : 100
+      hibernate:
+        default_schema: ENC(H18FCFxj8pzuepzje8VCYCEFnxzHKUa6F7vDH1RPVwAipy9ef+YuRyfnafX4yEUP)
+#      '[hibernate.default_batch_fetch_size]' : 100
 
 logging:
   level:

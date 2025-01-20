@@ -11,11 +11,13 @@ public class JasyptTest {
     /* prod DB정보 암호화 */
     @Test
     public void stringEncryptor() {
-        String url = "jdbc:postgresql://localhost:5432/nk_dev?currentSchema=naamk_bank&useunicode=true&characterencoding=utf-8";
+        String url = "jdbc:postgresql://localhost:5432/nk_dev?useunicode=true&characterencoding=utf-8";
         String username = "naamk";
         String password = "naamk_password";
+        String defaultSchema = "naamk_bank";
 
         log.info("[encrypt] url = {}", jasyptEncoding(url));
+        log.info("[encrypt] defaultSchema = {}", jasyptEncoding(defaultSchema));
         log.info("[encrypt] username = {}", jasyptEncoding(username));
         log.info("[encrypt] password = {}", jasyptEncoding(password));
     }

@@ -108,5 +108,5 @@ Error Common message Structure which, explanation of ServiceMessageType
 
 == COMMON (공통 코드 API)
 
-include::{docdir}/cmmn.adoc[]
+include::{docdir}/admin/cmmn.adoc[]
 

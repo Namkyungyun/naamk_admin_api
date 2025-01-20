@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/nk_dev?currentSchema=naamk_bank&useunicode=true&characterencoding=utf-8
+    url: jdbc:postgresql://localhost:5432/nk_dev?useunicode=true&characterencoding=utf-8
     username : naamk
     password: naamk_password
     hikari:
@@ -17,7 +17,9 @@ spring:
       ddl-auto: update
       naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
     properties:
-      '[hibernate.default_batch_fetch_size]' : 100
+      hibernate:
+        default_schema: naamk_bank
+#      '[hibernate.default_batch_fetch_size]' : 100
 
 logging:
   level:
