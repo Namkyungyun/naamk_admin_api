@@ -132,7 +132,7 @@ public class UserServiceTest {
 }
 
 ```
-
+---
 
 ## Rest Docs 설정하기
 ### build.gradle
@@ -225,6 +225,10 @@ asciidoctor {
     sources {
         include("**/index.adoc")
     }
+    // 다크테마
+    attributes 'source-highlighter': 'highlight.js'
+    //Asciidoctor에 snippetsDir 경로를 전달하여 스니펫 참조를 가능함
+    attributes 'snippets': snippetsDir
     // 경로를 baseDir로 맞춰준다!
     baseDirFollowsSourceFile()
 }
@@ -242,13 +246,23 @@ asciidoctor {
 ```groovy
 task copyDocument(type: Copy) { // (12)
     dependsOn asciidoctor
-    from asciidoctor.outputDir
-    into 'src/main/resources/static/docs'
+    from("${asciidoctor.outputDir}") {
+        include("**/index.html")
+    }
+    into file("src/main/resources/static/docs")
 }
 ```
 - Copy 태스크:
   - Asciidoctor 태스크 실행 후 생성된 HTML 문서를 src/main/resources/static/docs 디렉토리로 복사합니다.
   - 문서를 애플리케이션의 정적 리소스로 배포할 수 있도록 설정합니다.
+
+#### (9) build에 copyDocument task 추가
+```groovy
+build {
+    dependsOn copyDocument
+}
+```
+- dependsOn을 통해 copyDocument > asciidoctor > test 작업이 연결됨.
 
 #### build.gradle 설정 값에 대한 주요 작업 정리
 위 설정은 Spring REST Docs와 Asciidoctor를 사용하여 REST API 문서를 자동 생성 및 HTML로 변환하는 전체적인 빌드 과정입니다. 주요 작업은 다음과 같습니다:
@@ -261,9 +275,197 @@ task copyDocument(type: Copy) { // (12)
 3. HTML 문서를 정적 리소스 디렉토리로 복사
    - copyDocument 태스크로 HTML 파일을 src/main/resources/static/docs에 복사.
    - Spring Boot 애플리케이션 실행 시 /docs 경로에서 문서 제공 가능.
-   - 
+   
 이 설정을 통해 빌드 후 REST API 문서가 src/main/resources/static/docs에 HTML로 배포
 
+---
+### Rest Docs 생성
+#### (1) Test 코드 작성
+`RestDocsConfiguration.class`
+```java
+@TestConfiguration
+public class RestDocsConfiguration {
+
+    // RestDocumentationResultHandler -> REST Docs의 주요 구성 중 하나로, 테스트 실행 중 요청과 응답을 캡처하고 이를 문서화하는 역할.
+    // 이 핸들러는 테스트 메서드에서 자동으로 적용되어 REST Docs 문서를 생성
+    @Bean
+    public RestDocumentationResultHandler write() {
+        return MockMvcRestDocumentation.document(
+                "{class-name}/{method-name}", // 문서 저장 경로 형식
+                        Preprocessors.preprocessRequest( // 요청 데이터 문서화하기 전의 전처리 작업 수행
+                            Preprocessors.modifyUris()
+                                    .scheme("http")
+                                    .host("localhost"),
+            //                            .removePort(), // host가 도메인인 경우에는 상관없음 (개발 환경에서는 port 필요)
+                            Preprocessors.prettyPrint() // JSON 또는 XML 응답 데이터를 사람이 읽기 쉬운 형태로 변환
+                        ),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint())
+        );
+    }
+}
+```
+- test 모듈 내 config 패키지를 생성.
+    - @TestConfiguration
+        - test전용의 TestConfiguration 어노테이션 사용
+        - @TestConfiguration은 기본적으로 테스트 컨텍스트의 자동 스캔 대상이 아님. 외부 클래스로 선언된 경우, 기본적으로 테스트 컨텍스트에서 자동으로 감지되지 않음.
+        - 명시적으로 @Import를 사용하여 DI 활성화 필요.
+- Preprocessors.preprocessRequest() : 요청 데이터 문서화하기 전의 전처리 작업 수행
+    - build.gradle에서의 지정한 sinppets 생성 경로안에 저장될 형식을 지정
+        - curl request 또는 http request내에 포함될 ip, port 등의 정보 지정
+    - Preprocessors.prettyPrint()
+        - API 요청 데이터를 사람이 읽기 쉽게 변환.
+        - JSON, XML 형식의 데이터를 들여쓰기와 줄바꿈을 적용한 보기 좋은 형태로 변환.
+- Preprocessors.preprocessResponse() : 응답 데이터 문서화 하기전의 전처리 작업 수행
+    - Preprocessors.prettyPrint()
+        - API 응답 데이터를 사람이 읽기 쉽게 변환.
+        - JSON, XML 형식의 데이터를 들여쓰기와 줄바꿈을 적용한 보기 좋은 형태로 변환.
+---
+`RestDocsSupport.class`
+```java
+@ExtendWith({RestDocumentationExtension.class})
+@Import(RestDocsConfiguration.class)
+public abstract class RestDocsSupport {
+    @Autowired
+    protected ObjectMapper om;
+
+    @Autowired
+    protected RestDocumentationResultHandler restDoc;
+
+    @Autowired
+    protected MockMvc mockMvc;
+
+
+    @BeforeEach
+    public void setup(WebApplicationContext webApplicationContext,
+                       RestDocumentationContextProvider restDocumentation) {
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .addFilter(new CharacterEncodingFilter(StandardCharsets.UTF_8.name(), true))
+                .apply(MockMvcRestDocumentation.documentationConfiguration(restDocumentation))
+                // .apply(SecurityMockMvcConfigurers.springSecurity())
+                .alwaysDo(restDoc)
+                .build();
+    }
+}
+```
+- Spring Rest Docs를 사용하여 Rest API 문서화를 지원하기 위한 추상 클래스 작성
+- 클래스 선언
+    - @ExtendWith({RestDocumentationExtension.class}):
+        - Spring REST Docs의 확장을 사용하기 위해 JUnit 5의 Extension을 등록.
+        - REST API 테스트 실행 시 필요한 RestDocumentationContextProvider를 주입하기 위해 필요.
+- 필드 선언
+    - ObjectMapper om:
+        - JSON 직렬화/역직렬화를 지원하는 Jackson의 ObjectMapper를 자동 주입.
+        - 테스트에서 객체를 JSON으로 변환하거나 JSON 데이터를 객체로 변환하는 데 사용.
+    - RestDocumentationResultHandler restDoc:
+        - REST Docs 결과를 처리하는 Bean.
+        - RestDocsConfiguration에서 정의된 write() 메서드(MockMvcRestDocumentation.document)를 사용해 API 문서를 생성.
+    - MockMvc mockMvc:
+        - Spring의 MockMvc 객체로, HTTP 요청을 시뮬레이션하여 컨트롤러의 동작을 테스트
+        - 이 객체는 테스트 메서드에서 사용
+- 메서드 선언
+    - @BeforeEach:
+        - JUnit 5에서 테스트 메서드가 실행되기 전에 항상 호출되는 메서드.
+        - MockMvc 및 REST Docs 관련 설정을 초기화.
+---
+`AControllerTest 작성`
+```java
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+class AControllerTest extends RestDocsSupport {
+
+    @Test
+    void testCreateCmmnGrp() throws Exception {
+        // 요청 데이터
+        String requestBody = om.writeValueAsString(
+            Map.of("cmmnGrpCd", "TEST_CODE", "cmmnGrpNm", "Test Name", "activated", true)
+        );
+
+        // MockMvc를 사용한 테스트
+        mockMvc.perform(post("/api/cmmn-grps")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+            .andExpect(status().isOk())
+            .andDo(restDoc.document(
+                requestFields(
+                    fieldWithPath("cmmnGrpCd").type(JsonFieldType.STRING).description("공통 그룹 코드"),
+                    fieldWithPath("cmmnGrpNm").type(JsonFieldType.STRING).description("공통 그룹 이름"),
+                    fieldWithPath("activated").type(JsonFieldType.BOOLEAN).description("활성화 여부")
+                ),
+                responseFields(
+                    fieldWithPath("header.resultCode").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("header.resultMessage").type(JsonFieldType.STRING).description("결과 메시지")
+                )
+            ))
+            .andReturn();
+    }
+}
+```
+- 빌드 또는 테스트 코드 실행을 통해 build/generated-snippets 내에 해당 test controller의 메서드별 .adoc 파일 확인
+  - 각 메서드 별로 설정된 
+  - curl-request.adoc
+  - http-request.adoc
+  - http-response.adoc
+  - request-body.adoc
+  - request-headers.adoc
+  - response-body.adoc
+  - response-fields.adoc
+
+---
+#### (2) {controller}.adoc, index.adoc 작성
+- 지시문 내의 ""에 포함될 값의 경우 구분자를 ','로 하되 공백을 주면 안됨.(띄어쓰기 들어갈 경우 warning 표시가 뜸)
+- 예) operation:{path}[snippets="curl-request,path-parameters"] 
+- .adoc는 메타데이터 설정과 지시자와 같은 일부 설정 외에는 마크다운 문법을 따름.
+
+`1. {controller}.adoc`
+> src/docs/asciidoc 경로에 {controller}.adoc 생성
+
+```markdown
+=== Create Common Group Code `( 공통 그룹 코드 생성 )`
+이 API는 공통 그룹 코드를 생성하는 기능을 제공합니다.
+
+[NOTE]
+====
+- 공통 그룹 코드(cmmnGrpCd)은 중복이 허용되지 않습니다.
+====
+operation::cmmn-controller-test/create-cmmn-grp[snippets="curl-request,request-fields,http-request"]
+operation::cmmn-controller-test/create-cmmn-grp[snippets="response-fields,http-response"]
+```
+- operation 지시자를 이용해 build/generated-snippets 경로 내에 생성된 .adoc 파일을 주입
+- 위의 cmmn-controller-test/create-cmmn-grp 의 경우 RestDocsConfiguration에 설정한 문서 저장경로
+- snippets라는 약어의 경우 build.gradle에서 설정한 attributes 'snippets': snippetsDir 을 이용
+- snippets="{values}" 에서의 values의 경우 문서 저장에 생성된 .adoc의 파일명 (여러 개의 파일을 넣는 경우 구분자로 ',' 넣으며 공백은 넣으면 안됨.)
+
+`2. index.adoc`
+> src/docs/asciidoc 경로에 index.adoc 생성
+
+(1) 문서 메타데이터 입력
+```markdown
+= API Documentation
+:doctype: book
+:toc-title: Table of Contents
+:source-highlighter: rouge
+:toc: left
+:toclevels: 2
+:sectnums:
+:seclinks:
+```
+
+(2) {controller}.adoc 주입
+```markdown
+== COMMON (공통 코드 API)
+
+include::{docdir}/cmmn.adoc[]
+```
+- include 지시자를 이용해 {controller}.adoc 파일을 index.adoc에 포함시킴.
+- {docdir}의 경우 .adoc문법중 하나로 index.adoc의 현재 경로를 가져오는 문법.
+
+`3. gradle build 진행`
 
 ## INIT DATA API 호출
 #### 권한 일반

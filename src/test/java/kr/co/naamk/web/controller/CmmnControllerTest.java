@@ -1,6 +1,6 @@
 package kr.co.naamk.web.controller;
 
-import kr.co.naamk.config.RestDocSupport;
+import kr.co.naamk.config.RestDocsSupport;
 import kr.co.naamk.config.RestDocsConfiguration;
 import kr.co.naamk.web.dto.CmmnDto;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @Import(RestDocsConfiguration.class)
 @Slf4j
-class CmmnControllerTest extends RestDocSupport {
+class CmmnControllerTest extends RestDocsSupport {
 
     final String COMMON_GROUP = "/cmmn-grps";
     final String COMMON = "/cmmns";
@@ -381,18 +381,18 @@ class CmmnControllerTest extends RestDocSupport {
                                 fieldWithPath("header.resultCode").type(JsonFieldType.NUMBER).description("결과코드"),
                                 fieldWithPath("header.resultMessage").type(JsonFieldType.STRING).description("결과메세지"),
                                 fieldWithPath("header.detailMessage").type(JsonFieldType.STRING).description("결과상세메세지"),
-                                fieldWithPath("body").type(JsonFieldType.OBJECT).description("바디선언문").optional()
-//                                fieldWithPath("body.entity").type(JsonFieldType.OBJECT).description("데이터부선언문"),
+                                fieldWithPath("body").type(JsonFieldType.OBJECT).description("바디선언문"),
+                                fieldWithPath("body.entity").type(JsonFieldType.OBJECT).description("데이터부선언문"),
 //                                subsectionWithPath("body.entity").ignored()
-//                                fieldWithPath("body.entity.id").type(JsonFieldType.NUMBER).description("공통 코드 SEQ"),
-//                                fieldWithPath("body.entity.cmmnGrpId").type(JsonFieldType.NUMBER).description("공통 코드 그룹 SEQ"),
-//                                fieldWithPath("body.entity.cmmnCd").type(JsonFieldType.STRING).description("공통 코드"),
-//                                fieldWithPath("body.entity.cmmnNm").type(JsonFieldType.STRING).description("공통 명"),
-//                                fieldWithPath("body.entity.cmmnDesc").type(JsonFieldType.STRING).description("공통 설명"),
-//                                fieldWithPath("body.entity.orderNum").type(JsonFieldType.NUMBER).description("정렬 번호"),
-//                                fieldWithPath("body.entity.activated").type(JsonFieldType.BOOLEAN).description("사용 여부"),
-//                                fieldWithPath("body.entity.createdAt").type(JsonFieldType.STRING).description("사용 여부"),
-//                                fieldWithPath("body.entity.updatedAt").type(JsonFieldType.STRING).description("사용 여부")
+                                fieldWithPath("body.entity.id").type(JsonFieldType.NUMBER).description("공통 코드 SEQ"),
+                                fieldWithPath("body.entity.cmmnGrpId").type(JsonFieldType.NUMBER).description("공통 코드 그룹 SEQ"),
+                                fieldWithPath("body.entity.cmmnCd").type(JsonFieldType.STRING).description("공통 코드"),
+                                fieldWithPath("body.entity.cmmnNm").type(JsonFieldType.STRING).description("공통 명"),
+                                fieldWithPath("body.entity.cmmnDesc").type(JsonFieldType.STRING).description("공통 설명"),
+                                fieldWithPath("body.entity.orderNum").type(JsonFieldType.NUMBER).description("정렬 번호"),
+                                fieldWithPath("body.entity.activated").type(JsonFieldType.BOOLEAN).description("사용 여부"),
+                                fieldWithPath("body.entity.createdAt").type(JsonFieldType.STRING).description("생성일"),
+                                fieldWithPath("body.entity.updatedAt").type(JsonFieldType.STRING).description("수정일")
                         )
                 ))
                 .andReturn();
@@ -400,9 +400,84 @@ class CmmnControllerTest extends RestDocSupport {
 
     @Test
     void getAllCmmByCmmnGrpId() throws Exception{
+        // given
+        String urlPath = COMMON_GROUP + "/{grpId}" + COMMON;
+        Long grpId = 1L;
+
+        // when & then
+        this.mockMvc.perform(get(urlPath, grpId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(restDoc.document(
+                        requestHeaders(),
+                        pathParameters(
+                                parameterWithName("grpId").description("공통 그룹 SEQ")
+                        ),
+                        responseFields(
+                                fieldWithPath("header").type(JsonFieldType.OBJECT).description("헤더선언문"),
+                                fieldWithPath("header.responseTime").type(JsonFieldType.STRING).description("결과받은시간"),
+                                fieldWithPath("header.actionMethod").type(JsonFieldType.STRING).description("호출 Http 메서드"),
+                                fieldWithPath("header.actionUrl").type(JsonFieldType.STRING).description("호출 url"),
+                                fieldWithPath("header.resultCode").type(JsonFieldType.NUMBER).description("결과코드"),
+                                fieldWithPath("header.resultMessage").type(JsonFieldType.STRING).description("결과메세지"),
+                                fieldWithPath("header.detailMessage").type(JsonFieldType.STRING).description("결과상세메세지"),
+                                fieldWithPath("body").type(JsonFieldType.OBJECT).description("바디선언문"),
+                                fieldWithPath("body.entity").type(JsonFieldType.ARRAY).description("데이터부선언문"),
+//                                subsectionWithPath("body.entity").ignored()
+                                fieldWithPath("body.entity[].id").type(JsonFieldType.NUMBER).description("공통 코드 SEQ"),
+                                fieldWithPath("body.entity[].cmmnGrpId").type(JsonFieldType.NUMBER).description("공통 코드 그룹 SEQ"),
+                                fieldWithPath("body.entity[].cmmnCd").type(JsonFieldType.STRING).description("공통 코드"),
+                                fieldWithPath("body.entity[].cmmnNm").type(JsonFieldType.STRING).description("공통 명"),
+                                fieldWithPath("body.entity[].orderNum").type(JsonFieldType.NUMBER).description("정렬 번호"),
+                                fieldWithPath("body.entity[].activated").type(JsonFieldType.BOOLEAN).description("사용 여부")
+                        )
+                ))
+                .andReturn();
     }
 
     @Test
     void getDetailCmmnInCmmnGrp() throws Exception{
+        // given
+        String urlPath = COMMON_GROUP + "/{grpId}" + COMMON + "/{id}";
+        Long grpId = 1L;
+        Long id = 1L;
+
+        // when & then
+        this.mockMvc.perform(get(urlPath, grpId, id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(restDoc.document(
+                        requestHeaders(),
+                        pathParameters(
+                                parameterWithName("grpId").description("공통 그룹 SEQ"),
+                                parameterWithName("id").description("공통 SEQ")
+                        ),
+                        responseFields(
+                                fieldWithPath("header").type(JsonFieldType.OBJECT).description("헤더선언문"),
+                                fieldWithPath("header.responseTime").type(JsonFieldType.STRING).description("결과받은시간"),
+                                fieldWithPath("header.actionMethod").type(JsonFieldType.STRING).description("호출 Http 메서드"),
+                                fieldWithPath("header.actionUrl").type(JsonFieldType.STRING).description("호출 url"),
+                                fieldWithPath("header.resultCode").type(JsonFieldType.NUMBER).description("결과코드"),
+                                fieldWithPath("header.resultMessage").type(JsonFieldType.STRING).description("결과메세지"),
+                                fieldWithPath("header.detailMessage").type(JsonFieldType.STRING).description("결과상세메세지"),
+                                fieldWithPath("body").type(JsonFieldType.OBJECT).description("바디선언문"),
+                                fieldWithPath("body.entity").type(JsonFieldType.OBJECT).description("데이터부선언문"),
+//                                subsectionWithPath("body.entity").ignored()
+                                fieldWithPath("body.entity.id").type(JsonFieldType.NUMBER).description("공통 코드 SEQ"),
+                                fieldWithPath("body.entity.cmmnGrpId").type(JsonFieldType.NUMBER).description("공통 코드 그룹 SEQ"),
+                                fieldWithPath("body.entity.cmmnCd").type(JsonFieldType.STRING).description("공통 코드"),
+                                fieldWithPath("body.entity.cmmnNm").type(JsonFieldType.STRING).description("공통 명"),
+                                fieldWithPath("body.entity.cmmnDesc").type(JsonFieldType.STRING).description("공통 설명"),
+                                fieldWithPath("body.entity.orderNum").type(JsonFieldType.NUMBER).description("정렬 번호"),
+                                fieldWithPath("body.entity.activated").type(JsonFieldType.BOOLEAN).description("사용 여부"),
+                                fieldWithPath("body.entity.createdAt").type(JsonFieldType.STRING).description("생성일"),
+                                fieldWithPath("body.entity.updatedAt").type(JsonFieldType.STRING).description("수정일")
+                        )
+                ))
+                .andReturn();
     }
 }

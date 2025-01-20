@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 
 @ExtendWith({RestDocumentationExtension.class})
 @Import(RestDocsConfiguration.class)
-public abstract class RestDocSupport {
+public abstract class RestDocsSupport {
     @Autowired
     protected ObjectMapper om;
 

@@ -144,10 +144,10 @@ asciidoctor {
 
 task copyDocument(type: Copy) { // (12)
     dependsOn asciidoctor
-     from("${asciidoctor.outputDir}") {
-         include("**/index.html")
-     }
-     into file("src/main/resources/static/docs")
+    from("${asciidoctor.outputDir}") {
+        include("**/index.html")
+    }
+    into file("src/main/resources/static/docs")
 }
 
 build.doFirst {
